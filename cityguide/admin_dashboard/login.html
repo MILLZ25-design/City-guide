@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>City Guide - Admin Sign In</title>
+<style>
+:root{--primary:#0F766E;--primary-fg:#fff;--fg:#134E4A;--cor:#E8553D;--muted:#334155}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;font-family:"Segoe UI",Arial,sans-serif;letter-spacing:-.012em;color:var(--fg);background-color:#eef5f4;background-image:radial-gradient(at 15% 20%,rgba(95,199,187,.65) 0,transparent 50%),radial-gradient(at 85% 15%,rgba(232,85,61,.3) 0,transparent 48%),radial-gradient(at 75% 85%,rgba(15,118,110,.5) 0,transparent 52%),radial-gradient(at 20% 85%,rgba(167,243,208,.7) 0,transparent 50%),radial-gradient(at 50% 50%,rgba(224,242,254,.8) 0,transparent 60%);background-size:140% 140%;animation:shift 14s ease-in-out infinite alternate}
+@keyframes shift{0%{background-position:0% 20%}50%{background-position:100% 60%}100%{background-position:20% 100%}}
+.card{width:100%;max-width:420px;padding:40px 36px;border-radius:32px;background:rgba(255,255,255,.28);-webkit-backdrop-filter:blur(32px) saturate(1.8);backdrop-filter:blur(32px) saturate(1.8);border:1px solid rgba(255,255,255,.75);box-shadow:0 32px 64px -20px rgba(19,78,74,.28),inset 0 1px 1px rgba(255,255,255,.95)}
+.title{margin:0 0 4px;font-size:1.85rem;font-weight:600;letter-spacing:-.03em}
+.sub{margin:0 0 22px;font-size:.92rem;color:var(--muted)}
+.label{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#1e293b}
+.field{display:flex;align-items:center;height:48px;padding:0 1.1rem;border-radius:14px;background:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.8);transition:.2s}
+.field:focus-within{background:rgba(255,255,255,.85);border-color:var(--primary);box-shadow:0 0 0 3px rgba(15,118,110,.2)}
+.field input{flex:1;min-width:0;border:0;outline:0;background:none;font:inherit;font-size:.95rem;font-weight:500;color:var(--fg)}
+.field input::placeholder{color:#64748b;font-weight:400;opacity:.8}
+.submit{width:100%;height:46px;margin-top:8px;border:0;border-radius:99px;background:var(--primary);color:var(--primary-fg);font:inherit;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(15,118,110,.35);transition:.2s}
+.submit:hover{transform:translateY(-2px);filter:brightness(1.05)}
+.submit:disabled{opacity:.6;cursor:wait;transform:none}
+@media (pointer:coarse){.field input{font-size:16px}}
+</style>
+</head>
+<body>
+
+<main class="card">
+  <h1 class="title">Admin sign in</h1>
+  <p class="sub">Access the City Guide admin console.</p>
+  <form id="adminForm">
+    <label class="label">Admin email
+      <span class="field"><input type="email" name="email" placeholder="admin@cityguide.app" required autocomplete="email"></span>
+    </label>
+    <label class="label">Password
+      <span class="field"><input type="password" name="password" placeholder="Enter your password" required autocomplete="current-password"></span>
+    </label>
+    <button type="submit" class="submit">Sign in →</button>
+  </form>
+</main>
+
+<script>
+const API_BASE='https://app-citi-guide-backend.onrender.com';
+const ACCESS_KEY='cityguide_access_token',REFRESH_KEY='cityguide_refresh_token';
+
+document.getElementById('adminForm').addEventListener('submit',async event=>{
+  event.preventDefault();
+  const form=event.target,submit=form.querySelector('button[type="submit"]');
+  const data=Object.fromEntries(new FormData(form).entries());
+  submit.disabled=true;submit.textContent='Please wait…';
+  try{
+    const response=await fetch(API_BASE+'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    const result=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(result.message||result.detail||'Sign in failed.');
+    if(!result.accessToken||!result.refreshToken||!result.user)throw new Error('The server returned an incomplete sign-in response.');
+    if(result.user.role!=='ADMIN'){
+      await fetch(API_BASE+'/api/auth/logout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:result.refreshToken})}).catch(()=>{});
+      throw new Error('This account does not have admin access.');
+    }
+    localStorage.setItem(ACCESS_KEY,result.accessToken);
+    localStorage.setItem(REFRESH_KEY,result.refreshToken);
+    window.location.href='city-guide-admin.html';
+  }catch(error){
+    console.error(error);
+    alert(error.message||'Unable to sign in.');
+    submit.disabled=false;submit.textContent='Sign in →';
+  }
+});
+</script>
+</body>
+</html>
