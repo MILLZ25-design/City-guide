@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>City Guide - Sign In</title>
+<favicon></favicon>
+<style>
+:root {
+  --primary: #0F766E;
+  --primary-fg: #ffffff;
+  --fg: #134E4A;
+  --cor: #E8553D;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* 🌟 IRIDESCENT ANIMATED MESH BACKGROUND */
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  letter-spacing: -.012em;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background-color: #eef5f4;
+  background-image:
+    radial-gradient(at 15% 20%, rgba(95, 199, 187, 0.65) 0px, transparent 50%),
+    radial-gradient(at 85% 15%, rgba(232, 85, 61, 0.3) 0px, transparent 48%),
+    radial-gradient(at 75% 85%, rgba(15, 118, 110, 0.5) 0px, transparent 52%),
+    radial-gradient(at 20% 85%, rgba(167, 243, 208, 0.7) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(224, 242, 254, 0.8) 0px, transparent 60%);
+  background-size: 140% 140%;
+  animation: iridescentShift 14s ease-in-out infinite alternate;
+}
+
+@keyframes iridescentShift {
+  0% { background-position: 0% 20%; }
+  50% { background-position: 100% 60%; }
+  100% { background-position: 20% 100%; }
+}
+
+.auth-switch {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 🌟 FROSTED TRANSPARENT GLASS CONTAINER */
+.as-container {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  height: 580px;
+  background: rgba(255, 255, 255, 0.28);
+  -webkit-backdrop-filter: blur(32px) saturate(1.8);
+  backdrop-filter: blur(32px) saturate(1.8);
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 32px 64px -20px rgba(19, 78, 74, 0.28),
+              inset 0 1px 1px rgba(255, 255, 255, 0.95),
+              inset 0 0 24px rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+}
+
+/* 🌟 SLIDING FROSTED GREEN OVERLAY */
+.as-container::before {
+  content: "";
+  position: absolute;
+  height: 2000px;
+  width: 2000px;
+  top: -10%;
+  right: 48%;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.86), rgba(19, 78, 74, 0.92));
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  backdrop-filter: blur(28px) saturate(1.6);
+  border-radius: 50%;
+  z-index: 6;
+  transition: 1.8s cubic-bezier(0.77, 0, 0.175, 1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45),
+              inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+.as-container.customer::before {
+  transform: translate(100%, -50%);
+  right: 52%;
+}
+
+.as-forms {
+  position: absolute;
+  top: 50%;
+  left: 75%;
+  width: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  z-index: 8;
+  transition: left 1s 0.7s ease-in-out;
+}
+.as-container.customer .as-forms { left: 25%; }
+
+.as-form {
+  grid-area: 1 / 1;
+  display: none;
+  justify-content: center;
+  padding: 0 4rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0s 0.3s;
+}
+.as-form.active {
+  display: flex;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s 0.7s, visibility 0s 0.7s;
+}
+.as-inner {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Form Typography & Spacing Hierarchy (Always Dark Teal over Frosted Glass) */
+.as-title {
+  font-size: 1.85rem;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  letter-spacing: -.03em;
+  color: #134E4A;
+}
+.as-sub {
+  margin: 0 0 16px 0;
+  font-size: 0.92rem;
+  color: #334155;
+}
+.as-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* 6px gap from label text to input */
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #1e293b;
+  margin-bottom: 16px; /* 16px gap between field items */
+}
+.as-label:last-of-type {
+  margin-bottom: 24px; /* 24px gap from last field to submit button */
+}
+
+/* Translucent Glass Input Fields */
+.as-field {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  height: 48px;
+  padding: 0 1.1rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.45);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.6), 0 4px 12px rgba(19, 78, 74, 0.04);
+  transition: 0.2s;
+}
+.as-field:focus-within {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.2);
+}
+.as-field input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #134E4A;
+}
+.as-field input::placeholder {
+  color: #64748b;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.as-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 46px;
+  border: 0;
+  border-radius: 99px;
+  background: var(--primary);
+  color: var(--primary-fg);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  box-shadow: 0 6px 18px rgba(15, 118, 110, 0.35);
+}
+.as-submit:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+
+.as-switch-text {
+  margin: 1.1rem 0 0;
+  text-align: center;
+  font-size: 0.88rem;
+  color: #334155;
+}
+.as-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+}
+.as-link:hover { text-decoration: underline; }
+
+/* Sliding Panels Layer (z-index: 7) */
+.as-panels {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  pointer-events: none;
+  z-index: 7;
+}
+.as-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 12%;
+  text-align: center;
+}
+.as-panel-content {
+  transition: transform 0.9s cubic-bezier(0.77, 0, 0.175, 1) 0.6s, visibility 0s 1.5s;
+  visibility: hidden;
+}
+.as-panel h3 {
+  margin: 0;
+  font-size: 1.65rem;
+  font-weight: 600;
+  letter-spacing: -.02em;
+}
+.as-panel p {
+  margin: 0.5rem 0 1.35rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Panel on Frosted Glass Side (Light Side) -> Dark Teal Text */
+.as-container.customer .as-panel-right h3,
+.as-container:not(.customer) .as-panel-left h3 {
+  color: white;
+}
+.as-container.customer .as-panel-right p,
+.as-container:not(.customer) .as-panel-left p {
+  color: #fff;
+}
+.as-container.customer .as-panel-right .as-ghost,
+.as-container:not(.customer) .as-panel-left .as-ghost {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(15, 118, 110, 0.3);
+}
+
+/* Panel on Green Overlay Side -> White Text */
+.as-container.customer .as-panel-left h3,
+.as-container:not(.customer) .as-panel-right h3 {
+  color: #ffffff;
+}
+.as-container.customer .as-panel-left p,
+.as-container:not(.customer) .as-panel-right p {
+  color: #e2e8f0;
+}
+.as-container.customer .as-panel-left .as-ghost,
+.as-container:not(.customer) .as-panel-right .as-ghost {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.55);
+  color: #ffffff;
+}
+
+.as-panel-left .as-panel-content { transform: none; visibility: visible; transition: transform 0.9s cubic-bezier(0.77, 0, 0.175, 1) 0.6s, visibility 0s 0s; }
+.as-panel-right .as-panel-content { transform: translateX(800px); }
+.as-container.customer .as-panel-left .as-panel-content { transform: translateX(-800px); visibility: hidden; transition: transform 0.9s cubic-bezier(0.77, 0, 0.175, 1) 0.6s, visibility 0s 1.5s; }
+.as-container.customer .as-panel-right .as-panel-content { transform: none; visibility: visible; transition: transform 0.9s cubic-bezier(0.77, 0, 0.175, 1) 0.6s, visibility 0s 0s; }
+
+.as-ghost {
+  pointer-events: auto;
+  height: 42px;
+  padding: 0 1.6rem;
+  border-radius: 99px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.as-ghost:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+@media (max-width: 870px) {
+  .as-container { height: auto; display: flex; flex-direction: column; }
+  .as-container::before { display: none; }
+  .as-forms, .as-container.customer .as-forms {
+    position: static; left: auto; width: 100%; transform: none; padding: 2.5rem 1.5rem 1.5rem;
+    background: rgba(255, 255, 255, 0.35);
+  }
+  .as-form { padding: 0; }
+  .as-panels { position: static; display: block; pointer-events: auto; }
+  .as-panel { padding: 2rem 1.5rem; color: #134E4A; }
+  .as-panel p { color: #334155; }
+  .as-panel-left, .as-panel-right { display: none; }
+  .as-container .as-panel-left { display: flex; }
+  .as-container.customer .as-panel-left { display: none; }
+  .as-container.customer .as-panel-right { display: flex; }
+  .as-container .as-panel .as-panel-content { transform: none !important; visibility: visible !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="auth-switch">
+  <div class="as-container customer" id="authContainer">
+    
+    <!-- FORMS -->
+    <div class="as-forms">
+      
+      <!-- 1. Customer Sign In -->
+      <form class="as-form customer signin active" id="form-customer-signin" onsubmit="handleAuth(event, 'customer-signin')">
+        <div class="as-inner">
+          <h2 class="as-title">Welcome back</h2>
+          <p class="as-sub">Sign in to your City Guide account.</p>
+          
+          <label class="as-label">Email address
+            <span class="as-field">
+              <input type="email" name="email" placeholder="you@email.com" required autocomplete="email">
+            </span>
+          </label>
+          
+          <label class="as-label">Password
+            <span class="as-field">
+              <input type="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+            </span>
+          </label>
+          
+          <button type="submit" class="as-submit">Sign in →</button>
+          <p class="as-switch-text">New customer? <button type="button" class="as-link" onclick="switchView('customer', 'signup')">Create a new account</button></p>
+        </div>
+      </form>
+
+      <!-- 2. Customer Sign Up -->
+      <form class="as-form customer signup" id="form-customer-signup" onsubmit="handleAuth(event, 'customer-signup')">
+        <div class="as-inner">
+          <h2 class="as-title">Create account</h2>
+          <p class="as-sub">Join City Guide in a minute.</p>
+          
+          <label class="as-label">Full name
+            <span class="as-field">
+              <input type="text" name="name" placeholder="Jane Doe" required autocomplete="name">
+            </span>
+          </label>
+          
+          <label class="as-label">Email address
+            <span class="as-field">
+              <input type="email" name="email" placeholder="you@email.com" required autocomplete="email">
+            </span>
+          </label>
+          
+          <label class="as-label">Password
+            <span class="as-field">
+              <input type="password" name="password" placeholder="Enter your password" required autocomplete="new-password">
+            </span>
+          </label>
+          
+          <button type="submit" class="as-submit">Create account →</button>
+          <p class="as-switch-text">Already a customer? <button type="button" class="as-link" onclick="switchView('customer', 'signin')">Sign in</button></p>
+        </div>
+      </form>
+
+      <!-- 3. Admin Sign In -->
+      <form class="as-form admin signin" id="form-admin-signin" onsubmit="handleAuth(event, 'admin-signin')">
+        <div class="as-inner">
+          <h2 class="as-title">Admin sign in</h2>
+          <p class="as-sub">Access the City Guide admin console.</p>
+          
+          <label class="as-label">Admin email
+            <span class="as-field">
+              <input type="email" name="email" placeholder="admin@cityguide.app" required autocomplete="email">
+            </span>
+            
+          </label>
+          
+          <label class="as-label">Password
+            <span class="as-field">
+              <input type="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+            </span>
+          </label>
+          
+          <button type="submit" class="as-submit">Sign in →</button>
+          <p class="as-switch-text">New admin? <button type="button" class="as-link" onclick="switchView('admin', 'signup')">Create an admin account</button></p>
+        </div>
+      </form>
+
+      <!-- 4. Admin Sign Up -->
+      <form class="as-form admin signup" id="form-admin-signup" onsubmit="handleAuth(event, 'admin-signup')">
+        <div class="as-inner">
+          <h2 class="as-title">Create admin</h2>
+          <p class="as-sub">Set up access for the admin console.</p>
+          
+          <label class="as-label">Full name
+            <span class="as-field">
+              <input type="text" name="name" placeholder="Jane Doe" required autocomplete="name">
+            </span>
+          </label>
+          
+          <label class="as-label">Admin email
+            <span class="as-field">
+              <input type="email" name="email" placeholder="admin@cityguide.app" required autocomplete="email">
+            </span>
+          </label>
+          
+          <label class="as-label">Password
+            <span class="as-field">
+              <input type="password" name="password" placeholder="Enter your password" required autocomplete="new-password">
+            </span>
+          </label>
+          
+          <button type="submit" class="as-submit">Create admin account →</button>
+          <p class="as-switch-text">Already an admin? <button type="button" class="as-link" onclick="switchView('admin', 'signin')">Sign in</button></p>
+        </div>
+      </form>
+
+    </div>
+
+    <!-- PANELS (Left and Right Sliders) -->
+    <div class="as-panels">
+      <div class="as-panel as-panel-left">
+        <div class="as-panel-content">
+          <h3>Customer view?</h3>
+          <p>Switch back to customer sign in.</p>
+          <button type="button" class="as-ghost" onclick="switchMode('customer')">Customer sign in</button>
+        </div>
+      </div>
+
+      <div class="as-panel as-panel-right">
+        <div class="as-panel-content">
+          <h3>Admin console</h3>
+          <p>Store staff? Sign in to manage the city guide.</p>
+          <button type="button" class="as-ghost" onclick="switchMode('admin')">Admin sign in</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let currentMode = 'customer';
+  let currentView = 'signin';
+
+  function switchMode(mode) {
+    currentMode = mode;
+    currentView = 'signin';
+    updateDisplay();
+  }
+
+  function switchView(mode, view) {
+    currentMode = mode;
+    currentView = view;
+    updateDisplay();
+  }
+
+  function updateDisplay() {
+    const container = document.getElementById('authContainer');
+    container.className = 'as-container ' + currentMode;
+
+    document.querySelectorAll('.as-form').forEach(form => {
+      form.classList.remove('active');
+    });
+
+    const activeForm = document.getElementById(`form-${currentMode}-${currentView}`);
+    if (activeForm) {
+      activeForm.classList.add('active');
+    }
+  }
+
+  async function handleAuth(event, type) {
+    event.preventDefault();
+
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData.entries());
+
+    const apiRoutes = {
+      'customer-signin': 'http://localhost:3000/api/customers/login',
+      'customer-signup': 'http://localhost:3000/api/customers/register',
+      'admin-signin': 'http://localhost:3000/api/admin/login',
+      'admin-signup': 'http://localhost:3000/api/admin/register'
+    };
+
+    const endpoint = apiRoutes[type];
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Authentication failed.');
+      }
+
+      if (result.token) {
+        localStorage.setItem('auth_token', result.token);
+      }
+
+      alert('Success! Welcome back.');
+
+      if (type.includes('admin')) {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'index.html';
+      }
+
+    } catch (error) {
+      console.error('Error:', error);
+      alert(error.message);
+    }
+  }
+</script>
+
+</body>
+</html>
