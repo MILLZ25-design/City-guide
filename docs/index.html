@@ -506,11 +506,13 @@ body {
     const formData = new FormData(event.target);
     const data = Object.fromEntries(formData.entries());
 
+    const API_BASE_URL = 'https://app-citi-guide-backend.onrender.com';
+
     const apiRoutes = {
-      'customer-signin': 'http://localhost:3000/api/customers/login',
-      'customer-signup': 'http://localhost:3000/api/customers/register',
-      'admin-signin': 'http://localhost:3000/api/admin/login',
-      'admin-signup': 'http://localhost:3000/api/admin/register'
+      'customer-signin': `${API_BASE_URL}/api/customers/login`,
+      'customer-signup': `${API_BASE_URL}/api/customers/register`,
+      'admin-signin': `${API_BASE_URL}/api/admin/login`,
+      'admin-signup': `${API_BASE_URL}/api/admin/register`
     };
 
     const endpoint = apiRoutes[type];
