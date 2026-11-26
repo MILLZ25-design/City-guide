@@ -9,15 +9,37 @@
 </head>
 <body>
   <section id="authScreen" aria-labelledby="loginTitle">
-    <form class="card auth-card" id="loginForm">
-      <div class="brand auth-brand"><div class="logo">&#128205;</div><div>City Guide<small>Admin Console</small></div></div>
-      <h1 id="loginTitle">Admin sign in</h1>
-      <p class="muted">Sign in with an administrator account to continue.</p>
-      <div id="loginError" class="error" role="alert" hidden></div>
-      <label for="email">Email</label><input id="email" name="email" type="email" autocomplete="username" required>
-      <label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required>
-      <div class="gap"><button class="btn p" type="submit">Sign in</button></div>
-    </form>
+    <div class="auth-switch">
+      <div class="as-container admin">
+        <div class="as-forms">
+          <form class="as-form admin signin active" id="loginForm">
+            <div class="as-inner">
+              <div class="brand auth-brand"><div class="logo">&#128205;</div><div>City Guide<small>Admin Console</small></div></div>
+              <h1 class="as-title" id="loginTitle">Admin sign in</h1>
+              <p class="as-sub">Sign in with an administrator account to continue.</p>
+              <div id="loginError" class="error" role="alert" hidden></div>
+              <label class="as-label" for="email">Admin email
+                <span class="as-field"><input id="email" name="email" type="email" placeholder="admin@cityguide.app" autocomplete="username" required></span>
+              </label>
+              <label class="as-label" for="password">Password
+                <span class="as-field"><input id="password" name="password" type="password" placeholder="Enter your password" autocomplete="current-password" required></span>
+              </label>
+              <button class="as-submit" type="submit">Sign in &#8594;</button>
+            </div>
+          </form>
+        </div>
+        <div class="as-panels" aria-hidden="true">
+          <div class="as-panel as-panel-left">
+            <div class="as-panel-content">
+              <h3>Admin console</h3>
+              <p>Sign in to manage the City Guide.</p>
+              <span class="as-ghost">City Guide Admin</span>
+            </div>
+          </div>
+          <div class="as-panel as-panel-right"></div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <div id="appShell" hidden>
@@ -99,8 +121,8 @@
         <div><label for="cityTimezone">Timezone</label><input id="cityTimezone" placeholder="Europe/Rome"></div>
         <div><label for="cityHue">Hue (0 to 360)</label><input id="cityHue" type="number" min="0" max="360"></div>
       </div>
-      <label for="cityBlurb">Short description</label><input id="cityBlurb" maxlength="200">
-      <label for="cityDescription">Description</label><textarea id="cityDescription" rows="3"></textarea>
+      <label for="cityBlurb">Short description</label><input id="cityBlurb" maxlength="200" required>
+      <label for="cityDescription">Description</label><textarea id="cityDescription" rows="3" required></textarea>
       <div class="dialog-actions"><button class="btn" id="cancelCity" type="button">Cancel</button><button class="btn p" type="submit">Save city</button></div>
     </form>
   </dialog>

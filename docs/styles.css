@@ -1501,3 +1501,283 @@ dialog h3{
   border-radius:6px;
   flex:none
 }
+
+/* Sign-in appearance adapted from the standalone City Guide login. */
+#authScreen{
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  width:100%;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:auto;
+  padding:20px;
+  background-color:#eef5f4;
+  background-image:
+    radial-gradient(at 15% 20%,rgba(95,199,187,.65) 0,transparent 50%),
+    radial-gradient(at 85% 15%,rgba(232,85,61,.3) 0,transparent 48%),
+    radial-gradient(at 75% 85%,rgba(15,118,110,.5) 0,transparent 52%),
+    radial-gradient(at 20% 85%,rgba(167,243,208,.7) 0,transparent 50%),
+    radial-gradient(at 50% 50%,rgba(224,242,254,.8) 0,transparent 60%);
+  background-size:140% 140%;
+  animation:adminIridescentShift 14s ease-in-out infinite alternate;
+  font-family:"Segoe UI",Arial,sans-serif;
+  letter-spacing:-.012em
+}
+@keyframes adminIridescentShift{
+  0%{background-position:0 20%}
+  50%{background-position:100% 60%}
+  100%{background-position:20% 100%}
+}
+#authScreen .auth-switch{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center
+}
+#authScreen .as-container{
+  position:relative;
+  width:100%;
+  max-width:900px;
+  height:580px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.75);
+  border-radius:32px;
+  background:rgba(255,255,255,.28);
+  box-shadow:0 32px 64px -20px rgba(19,78,74,.28),inset 0 1px 1px rgba(255,255,255,.95),inset 0 0 24px rgba(255,255,255,.25);
+  -webkit-backdrop-filter:blur(32px) saturate(1.8);
+  backdrop-filter:blur(32px) saturate(1.8)
+}
+#authScreen .as-container::before{
+  content:"";
+  position:absolute;
+  top:-10%;
+  right:48%;
+  z-index:6;
+  width:2000px;
+  height:2000px;
+  transform:translateY(-50%);
+  border-radius:50%;
+  background:linear-gradient(135deg,rgba(15,118,110,.86),rgba(19,78,74,.92));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 0 0 1px rgba(255,255,255,.2);
+  -webkit-backdrop-filter:blur(28px) saturate(1.6);
+  backdrop-filter:blur(28px) saturate(1.6)
+}
+#authScreen .as-forms{
+  position:absolute;
+  top:50%;
+  left:75%;
+  z-index:8;
+  display:grid;
+  width:50%;
+  transform:translate(-50%,-50%)
+}
+#authScreen .as-form{
+  grid-area:1/1;
+  display:flex;
+  justify-content:center;
+  padding:0 4rem
+}
+#authScreen .as-inner{
+  display:flex;
+  flex-direction:column;
+  width:100%;
+  max-width:380px
+}
+#authScreen .auth-brand{
+  margin:0 0 20px;
+  color:#134e4a
+}
+#authScreen .auth-brand small{
+  color:#334155
+}
+#authScreen .as-title{
+  margin:0 0 4px;
+  color:#134e4a;
+  font-size:1.85rem;
+  font-weight:600;
+  letter-spacing:-.03em
+}
+#authScreen .as-sub{
+  margin:0 0 16px;
+  color:#334155;
+  font-size:.92rem
+}
+#authScreen .as-label{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin:0 0 16px;
+  color:#1e293b;
+  font-size:.7rem;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase
+}
+#authScreen .as-label:last-of-type{
+  margin-bottom:24px
+}
+#authScreen .as-field{
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+  height:48px;
+  padding:0 1.1rem;
+  border:1px solid rgba(255,255,255,.8);
+  border-radius:14px;
+  background:rgba(255,255,255,.45);
+  box-shadow:inset 0 1px 2px rgba(255,255,255,.6),0 4px 12px rgba(19,78,74,.04);
+  -webkit-backdrop-filter:blur(16px);
+  backdrop-filter:blur(16px);
+  transition:.2s
+}
+#authScreen .as-field:focus-within{
+  border-color:var(--primary);
+  background:rgba(255,255,255,.85);
+  box-shadow:0 0 0 3px rgba(15,118,110,.2)
+}
+#authScreen .as-field input{
+  flex:1;
+  min-width:0;
+  width:auto;
+  padding:0;
+  border:0;
+  outline:0;
+  background:none;
+  color:#134e4a;
+  font:inherit;
+  font-size:.95rem;
+  font-weight:500
+}
+#authScreen .as-field input::placeholder{
+  color:#64748b;
+  font-weight:400;
+  opacity:.8
+}
+#authScreen .as-submit{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.5rem;
+  width:100%;
+  height:46px;
+  border:0;
+  border-radius:99px;
+  background:var(--primary);
+  box-shadow:0 6px 18px rgba(15,118,110,.35);
+  color:var(--primary-fg);
+  font:inherit;
+  font-weight:600;
+  cursor:pointer;
+  transition:.2s
+}
+#authScreen .as-submit:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.05)
+}
+#authScreen .error:not([hidden]){
+  margin:-6px 0 12px;
+  font-size:.85rem
+}
+#authScreen .as-panels{
+  position:absolute;
+  inset:0;
+  z-index:7;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  pointer-events:none
+}
+#authScreen .as-panel{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:3rem 12%;
+  text-align:center
+}
+#authScreen .as-panel-content{
+  color:#fff;
+  transition:transform .9s cubic-bezier(.77,0,.175,1) .6s
+}
+#authScreen .as-panel h3{
+  margin:0;
+  color:#fff;
+  font-size:1.65rem;
+  font-weight:600;
+  letter-spacing:-.02em
+}
+#authScreen .as-panel p{
+  margin:.5rem 0 1.35rem;
+  color:#e2e8f0;
+  font-size:.95rem;
+  font-weight:500
+}
+#authScreen .as-ghost{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:42px;
+  padding:0 1.6rem;
+  border:1px solid rgba(255,255,255,.55);
+  border-radius:99px;
+  background:rgba(255,255,255,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4);
+  color:#fff;
+  font-size:.85rem;
+  font-weight:600;
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px)
+}
+@media(max-width:870px){
+  #authScreen .as-container{
+    display:flex;
+    flex-direction:column;
+    height:auto
+  }
+  #authScreen .as-container::before{
+    display:none
+  }
+  #authScreen .as-forms{
+    position:static;
+    left:auto;
+    width:100%;
+    transform:none;
+    padding:2.5rem 1.5rem 1.5rem;
+    background:rgba(255,255,255,.35)
+  }
+  #authScreen .as-form{
+    padding:0
+  }
+  #authScreen .as-panels{
+    position:static;
+    display:block
+  }
+  #authScreen .as-panel{
+    padding:2rem 1.5rem;
+    color:#134e4a
+  }
+  #authScreen .as-panel h3{
+    color:#134e4a
+  }
+  #authScreen .as-panel p{
+    color:#334155
+  }
+  #authScreen .as-ghost{
+    border-color:var(--primary);
+    background:var(--primary);
+    color:#fff
+  }
+}
+@media(max-width:480px){
+  #authScreen .as-forms{
+    padding:2rem 1.1rem 1.25rem
+  }
+  #authScreen .auth-brand{
+    margin-bottom:14px
+  }
+  #authScreen .as-title{
+    font-size:1.65rem
+  }
+}
