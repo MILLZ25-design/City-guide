@@ -304,7 +304,19 @@ svg.ch{overflow:visible}
 
  <section id="attractions" hidden>
   <div class="bar"><h2>Attractions &amp; events</h2><button class="btn p" id="add">+ Add new</button></div>
-  <div class="card tw"><table><thead><tr><th>Name</th><th>City</th><th>Category</th><th>Rating</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+  <div class="card tw"><table><thead><tr><th>Name</th><th>City</th><th>Category</th><th>Rating</th><th></th></tr></thead><tbody id="rows"></tbody></table>
+  <div class="gap" style="justify-content:center;align-items:center"><button class="btn" id="prevPage" type="button">← Previous</button><span class="muted" id="pageInfo"></span><button class="btn" id="nextPage" type="button">Next →</button></div></div>
+  <div class="card" style="margin-top:14px">
+   <div class="bar" style="margin-bottom:8px"><h3 style="margin:0">Cities</h3><button class="btn p" id="addCity" type="button">+ Add city</button></div>
+   <div class="tw"><table><thead><tr><th>Name</th><th>Country</th><th>Coordinates</th><th></th></tr></thead><tbody id="cityRows"></tbody></table></div>
+  </div>
+  <div class="card" style="margin-top:14px">
+   <h3>City cover images</h3><p class="muted">Upload or remove the cover image shown on the customer app's city cards.</p>
+   <label for="cityCoverSelect">City</label><select id="cityCoverSelect"><option value="">Choose a city</option></select>
+   <img id="cityCoverPreview" alt="Selected city cover preview" hidden style="display:block;max-width:100%;max-height:180px;object-fit:cover;border-radius:12px;margin-top:10px">
+   <label for="cityCoverFile">Cover image</label><input id="cityCoverFile" type="file" accept="image/jpeg,image/png,image/webp">
+   <div class="gap"><button class="btn" id="removeCityCover" type="button">Remove cover</button><button class="btn p" id="uploadCityCover" type="button">Upload cover</button></div>
+  </div>
  </section>
 
  <section id="reviews" hidden>
@@ -315,434 +327,249 @@ svg.ch{overflow:visible}
   <div class="bar"><h2>Notifications</h2></div>
   <div class="grid two">
    <div class="card"><h3>Send a notification</h3>
-    <label>Title</label><input id="nt"><label>Message</label><textarea id="nb" rows="3"></textarea>
+    <label>Category</label><select id="notificationCategory"><option value="NEWS">News</option><option value="EVENTS">Events</option><option value="REVIEWS">Reviews</option></select><label>Title</label><input id="nt" maxlength="120"><label>Message</label><textarea id="nb" rows="3" maxlength="1000"></textarea>
     <div class="gap"><button class="btn p" id="send">Send</button></div></div>
    <div class="card"><h3>Sent</h3><div id="sent"><p class="muted">Nothing sent yet.</p></div></div>
   </div>
  </section>
 
- <section id="profile" hidden><div class="card"><h3>Admin profile</h3><p class="muted">Name, email and picture come from the logged-in admin account.</p>
-  <div style="display:flex;gap:14px;align-items:center;margin-top:12px"><div class="av" id="avBig" style="width:64px;height:64px;font-size:22px"></div><div><b id="nm2"></b><br><span class="muted" id="em2"></span></div></div></div></section>
- <section id="security" hidden><div class="card"><h3>Security</h3><p class="muted">Only registered admins can open this console. Hook up password change here.</p></div></section>
- <section id="preferences" hidden><div class="card"><h3>Preferences</h3><p class="muted">Notification and display settings go here.</p></div></section>
+ <section id="profile" hidden><div class="card"><h3>Admin profile</h3><p class="muted">Update your admin name and profile picture. Email is managed by the account system.</p>
+  <div style="display:flex;gap:14px;align-items:center;margin-top:12px"><div class="av" id="avBig" style="width:64px;height:64px;font-size:22px"></div><div><b id="nm2"></b><br><span class="muted" id="em2"></span></div></div>
+  <label>Name</label><input id="profileName"><label>Profile picture</label><input id="profileAvatar" type="file" accept="image/*"><div class="gap"><button class="btn p" id="profileSave">Save profile</button></div></div></section>
+ <section id="security" hidden><div class="card"><h3>Security</h3><p class="muted">Change your admin account password.</p><form id="passwordForm"><label>Current password</label><input id="currentPassword" type="password" autocomplete="current-password" required><label>New password</label><input id="newPassword" type="password" autocomplete="new-password" required minlength="8"><label>Confirm new password</label><input id="confirmPassword" type="password" autocomplete="new-password" required><div class="gap"><button class="btn p" type="submit">Change password</button></div></form></div></section>
+ <section id="preferences" hidden><div class="card"><h3>Notification preferences</h3><p class="muted">Choose which types of app notifications your account receives.</p><label><input id="prefEvents" type="checkbox" style="width:auto"> Event notifications</label><label><input id="prefReviews" type="checkbox" style="width:auto"> Review notifications</label><label><input id="prefNews" type="checkbox" style="width:auto"> News notifications</label><div class="gap"><button class="btn p" id="preferencesSave">Save preferences</button></div></div></section>
 </main>
 
-<dialog id="dlg"><h3 style="margin:0">Add attraction</h3>
-  <label>Name</label><input id="fn"><label>City</label><input id="fc">
-  <label>Category</label><select id="fk"><option>Attraction</option><option>Restaurant</option><option>Hotel</option><option>Event</option></select>
-  <div class="gap"><button class="btn" id="cancel">Cancel</button><button class="btn p" id="save">Save</button></div></dialog>
+<dialog id="cityDlg"><h3 id="cityDialogTitle" style="margin:0">Add city</h3>
+  <label>City ID (leave blank to generate from name)</label><input id="cid" placeholder="e.g. lagos">
+  <label>Name</label><input id="cname" required>
+  <label>Country</label><input id="ccountry" required>
+  <label>Latitude</label><input id="clat" type="number" step="any" required>
+  <label>Longitude</label><input id="clng" type="number" step="any" required>
+  <label>Timezone</label><input id="ctz" placeholder="e.g. Africa/Lagos">
+  <label>Hue (0 to 360)</label><input id="chue" type="number" min="0" max="360">
+  <label>Short description</label><input id="cblurb" maxlength="200">
+  <label>Description</label><textarea id="cdesc" rows="3"></textarea>
+  <div class="gap"><button class="btn" id="cityCancel" type="button">Cancel</button><button class="btn p" id="citySave" type="button">Save</button></div></dialog>
+<dialog id="dlg">
+<form id="placeForm" onsubmit="return false"><h3 id="placeDialogTitle" style="margin:0">Add place</h3>
+  <label>Place ID (leave blank to generate from name)</label><input id="fid" placeholder="e.g. national-museum">
+  <label>Name</label><input id="fn" required>
+  <label>City</label><select id="fc" required></select>
+  <label>Category</label><select id="fk"><option value="attraction">Attraction</option><option value="restaurant">Restaurant</option><option value="hotel">Hotel</option><option value="event">Event</option></select>
+  <label>Description</label><textarea id="fdesc" rows="3" required></textarea>
+  <label>Address</label><input id="faddress" required>
+  <label>Phone</label><input id="fphone">
+  <label>Website</label><input id="fwebsite" type="url">
+  <div class="grid two"><div><label>Latitude</label><input id="flat" type="number" step="any" value="0"></div><div><label>Longitude</label><input id="flng" type="number" step="any" value="0"></div></div>
+  <label>Opening time</label><input id="fopens" type="time">
+  <label>Closing time</label><input id="fcloses" type="time">
+  <label><input id="fopen24" type="checkbox" style="width:auto"> Open 24 hours</label>
+  <label>Closed days (1=Monday to 7=Sunday, comma separated)</label><input id="fclosed" placeholder="e.g. 1,7">
+  <label>Opening hours text</label><input id="fhours" placeholder="e.g. Mon-Sat, 9am-6pm">
+  <label>Extra information</label><input id="fextra">
+  <label>Base rating (1 to 5)</label><input id="fbase" type="number" min="1" max="5" step="0.1" value="3">
+  <label>Event starts</label><input id="fstart" type="datetime-local">
+  <label>Event ends</label><input id="fend" type="datetime-local">
+  <label>Images (optional, select multiple)</label><input id="fimages" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+  <div class="gap"><button class="btn" id="cancel" type="button">Cancel</button><button class="btn p" id="save" type="button">Save</button></div>
+</form></dialog>
+
 
 <script>
-/* ---------- ADMIN ACCOUNT (backend hook) ----------
-   Set ADMIN_API to the endpoint your backend team gives you.
-   It should return JSON: { "name": "...", "email": "...", "avatar": "https://..." } */
-var ADMIN_API = null;
-async function loadAdmin(){
-  try{ if(ADMIN_API){ var r=await fetch(ADMIN_API,{credentials:'include'}); if(r.ok) return await r.json(); } }catch(e){}
-  return {name:'Amara Okoye',email:'admin@cityguide.app',avatar:''};
+const API_BASE = 'https://app-citi-guide-backend.onrender.com';
+const ACCESS_KEY = 'cityguide_access_token';
+const REFRESH_KEY = 'cityguide_refresh_token';
+let adminAccount = null, adminMe = null, cities = [], places = [], reviews = [], team = [], editingPlaceId = null;
+let placePageIndex = 0, placePageSize = 20, placeHasNext = false, editingCityId = null;
+const $ = id => document.getElementById(id);
+const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mediaUrl = value => !value ? '' : (/^https?:\/\//i.test(value) ? value : API_BASE + (value.startsWith('/') ? '' : '/') + value);
+const token = () => localStorage.getItem(ACCESS_KEY);
+function authHeaders(extra={}) { const h={...extra}; if(token()) h.Authorization='Bearer '+token(); return h; }
+async function refreshSession(){
+  const refreshToken=localStorage.getItem(REFRESH_KEY); if(!refreshToken) return false;
+  const response=await fetch(API_BASE+'/api/auth/refresh',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken})});
+  if(!response.ok) return false;
+  const data=await response.json(); localStorage.setItem(ACCESS_KEY,data.accessToken); if(data.refreshToken)localStorage.setItem(REFRESH_KEY,data.refreshToken); return true;
+}
+async function api(path, options={}, retry=true){
+  const headers=authHeaders(options.headers||{});
+  if(options.body && !(options.body instanceof FormData) && !headers['Content-Type']) headers['Content-Type']='application/json';
+  let response=await fetch(API_BASE+path,{...options,headers});
+  if(response.status===401 && retry && await refreshSession()) return api(path,options,false);
+  if(response.status===401){logoutLocal(); location.href='login.html'; throw new Error('Your session expired. Please sign in again.');}
+  const raw=await response.text(); let data=null; try{data=raw?JSON.parse(raw):null}catch(_){data=raw}
+  if(!response.ok){const message=data && (data.message || data.detail || data.error); throw new Error(message || ('Request failed ('+response.status+').'));}
+  return data;
+}
+function logoutLocal(){localStorage.removeItem(ACCESS_KEY);localStorage.removeItem(REFRESH_KEY);}
+function notify(message, isError=false){let el=$('adminNotice');if(!el){el=document.createElement('div');el.id='adminNotice';el.style.cssText='position:fixed;right:18px;bottom:18px;z-index:1000;max-width:min(420px,90vw);padding:12px 16px;border-radius:12px;background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow);';document.body.appendChild(el);}el.textContent=message;el.style.color=isError?'#dc2626':'var(--fg)';el.hidden=false;clearTimeout(el._timer);el._timer=setTimeout(()=>el.hidden=true,4200);}
+function initials(name){return String(name||'A').trim().split(/\s+/).map(x=>x[0]||'').join('').slice(0,2).toUpperCase();}
+function paintAvatar(el, person){if(!el)return;const url=mediaUrl(person && (person.avatar || person.avatarUrl));el.innerHTML=url?'<img alt="" src="'+esc(url)+'">':esc(initials(person && person.name));const img=el.querySelector('img');if(img)img.onerror=()=>{el.textContent=initials(person && person.name)};}
+function setLoading(on){document.body.classList.toggle('ld',on);}
+function setSection(id){document.querySelectorAll('main>section').forEach(s=>s.hidden=s.id!==id);document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('on',b.dataset.id===id));document.body.classList.remove('open');window.scrollTo(0,0);}
+function setupNavigation(){
+  const main=[['dashboard','Dashboard','grid'],['attractions','Attractions','pin'],['reviews','Reviews','star'],['notify','Notifications','bell']];
+  const settings=[['profile','Profile','user'],['security','Security','lock'],['preferences','Preferences','cog']];
+  const icons={grid:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',pin:'<svg viewBox="0 0 24 24"><path d="M12 22s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>',star:'<svg viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>',bell:'<svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21h4"/></svg>',user:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',lock:'<svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>',cog:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>'};
+  const html=list=>list.map(x=>'<button class="nav" data-id="'+x[0]+'">'+icons[x[2]]+'<span>'+x[1]+'</span>'+(x[0]==='reviews'?'<span class="b" id="reviewBadge">0</span>':'')+'</button>').join('');
+  $('nav1').innerHTML=html(main);$('nav2').innerHTML=html(settings);
+  document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>setSection(b.dataset.id)));
+  $('menu').onclick=()=>document.body.classList.toggle('open');$('scrim').onclick=()=>document.body.classList.remove('open');
+  $('theme').onclick=()=>{const root=document.documentElement,dark=root.dataset.theme==='dark'||(!root.dataset.theme&&matchMedia('(prefers-color-scheme:dark)').matches);root.dataset.theme=dark?'light':'dark';};
+  $('logout').onclick=async()=>{try{const rt=localStorage.getItem(REFRESH_KEY);if(rt)await api('/api/auth/logout',{method:'POST',body:JSON.stringify({refreshToken:rt})},false);}catch(_){}logoutLocal();location.href='login.html';};
+  document.querySelectorAll('[data-to]').forEach(b=>b.addEventListener('click',()=>setSection(b.dataset.to)));
+  $('more').onclick=()=>{const open=$('tuck').classList.toggle('open');$('more').setAttribute('aria-expanded',String(open));};
+  $('q').addEventListener('input',renderPlaces);
+}
+function renderAdminIdentity(){
+  const a=adminAccount||{};
+  $('welcome').textContent='Welcome back, '+(a.name||'Admin').split(' ')[0];
+  $('nm').textContent=$('nm2').textContent=a.name||'';
+  $('em').textContent=$('em2').textContent=a.email||'';
+  ['avTop','avSide','avBig'].forEach(id=>paintAvatar($(id),a));
+  $('profileName').value=a.name||'';
+}
+function renderDashboard(summary){
+  const values=[['Total places',summary.totalPlaces,'pin'],['Reviews',summary.totalReviews,'star'],['Registered users',summary.registeredUsers,'user'],['Cities',summary.totalCities,'globe']];
+  const icons={pin:'⌖',star:'★',user:'♙',globe:'◎'};
+  $('stats').innerHTML=values.map(v=>'<div class="card stat"><div class="t"><span>'+v[0]+'</span><span class="ico">'+icons[v[2]]+'</span></div><p>'+Number(v[1]||0).toLocaleString()+'</p><span class="muted" style="font-size:12px">Current database total</span></div>').join('');
+  const cityRows=(summary.cities||[]).slice(0,6);
+  $('cities').innerHTML=cityRows.length?cityRows.map(c=>{const max=Math.max(1,...cityRows.map(x=>x.listingCount||0));return '<div class="item"><div class="r"><b>'+esc(c.name)+'</b><span class="tag">'+Number(c.listingCount||0)+' listings</span></div><div class="r"><div class="prog"><i style="width:'+Math.round((c.listingCount||0)/max*100)+'%"></i></div></div></div>';}).join(''):'<p class="muted">No city data available.</p>';
+  $('activity').innerHTML='<p class="muted">Activity history is not provided by the current backend API.</p>';
+  $('projects').innerHTML='<p class="muted">Project tracking is not connected to the City Guide backend.</p>';
+  $('chart').innerHTML='<div class="muted" style="padding:22px 8px;text-align:center">Listing view and bounce analytics are not available from the current backend API.</div>';
+  $('chart').parentNode.querySelector('.leg').hidden=true;
+  $('bento').innerHTML='<button class="bi wide keep" data-to="attractions"><div class="row"><span class="ico">⌖</span><span class="chip">Manage</span></div><h4>Places <small>'+Number(summary.totalPlaces||0)+'</small></h4><p>Create, update and remove attractions, restaurants, hotels and events.</p></button><button class="bi" data-to="reviews"><div class="row"><span class="ico">★</span><span class="chip">Moderate</span></div><h4>Reviews <small>'+Number(summary.totalReviews||0)+'</small></h4><p>Review and remove user comments.</p></button><button class="bi" data-to="notify"><div class="row"><span class="ico">♧</span><span class="chip">Broadcast</span></div><h4>Notifications</h4><p>Send a message to users who enabled the selected notification type.</p></button>';
+  $('bento').querySelectorAll('[data-to]').forEach(b=>b.onclick=()=>setSection(b.dataset.to));
+}
+function categoryLabel(c){return ({attraction:'Attraction',restaurant:'Restaurant',hotel:'Hotel',event:'Event'})[String(c||'').toLowerCase()]||c||'—';}
+function cityName(id){const c=cities.find(x=>x.id===id);return c?c.name:id||'—';}
+function renderPlaces(){
+  const q=($('q').value||'').trim().toLowerCase();
+  const filtered=places.filter(p=>(p.name+' '+cityName(p.cityId)+' '+p.category).toLowerCase().includes(q));
+  $('rows').innerHTML=filtered.length?filtered.map(p=>'<tr><td><b>'+esc(p.name)+'</b></td><td>'+esc(cityName(p.cityId))+'</td><td><span class="tag">'+esc(categoryLabel(p.category))+'</span></td><td>★ '+Number(p.avgRating||0).toFixed(1)+' ('+Number(p.reviewCount||0)+')</td><td><button class="btn" data-edit="'+esc(p.id)+'">Edit</button> <button class="x" data-delete="'+esc(p.id)+'">Remove</button></td></tr>').join(''):'<tr><td colspan="5" class="muted">No places found.</td></tr>';
+  $('rows').querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editPlace(b.dataset.edit));
+  $('rows').querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>deletePlace(b.dataset.delete));
+}
+function slugify(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40);}
+function populateCitySelect(selected){const options='<option value="">Choose a city</option>'+cities.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join('');$('fc').innerHTML=options;if(selected)$('fc').value=selected;if($('cityCoverSelect')){const current=$('cityCoverSelect').value;$('cityCoverSelect').innerHTML=options;if(cities.some(c=>c.id===current))$('cityCoverSelect').value=current;renderCityCoverPreview();}}
+function renderCityCoverPreview(){const city=cities.find(c=>c.id===$('cityCoverSelect').value);const img=$('cityCoverPreview');if(city&&city.imageUrl){img.src=mediaUrl(city.imageUrl);img.hidden=false;img.onerror=()=>{img.hidden=true;};}else{img.removeAttribute('src');img.hidden=true;}}
+async function uploadCityCover(){const id=$('cityCoverSelect').value,file=$('cityCoverFile').files[0];if(!id){notify('Choose a city first.',true);return;}if(!file){notify('Choose an image first.',true);return;}const form=new FormData();form.append('file',file);try{const updated=await api('/api/admin/cities/'+encodeURIComponent(id)+'/image',{method:'POST',body:form});const i=cities.findIndex(c=>c.id===id);if(i>=0)cities[i]=updated;$('cityCoverFile').value='';renderCityCoverPreview();notify('City cover uploaded.');}catch(e){notify(e.message,true);}}
+async function removeCityCover(){const id=$('cityCoverSelect').value;if(!id){notify('Choose a city first.',true);return;}if(!confirm('Remove this city cover image?'))return;try{await api('/api/admin/cities/'+encodeURIComponent(id)+'/image',{method:'DELETE'});const i=cities.findIndex(c=>c.id===id);if(i>=0)cities[i]={...cities[i],imageUrl:null};renderCityCoverPreview();notify('City cover removed.');}catch(e){notify(e.message,true);}}
+function toLocalDate(value){if(!value)return '';const d=new Date(value);return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);}
+function fromLocalDate(value){return value?new Date(value).toISOString():null;}
+function resetPlaceForm(){editingPlaceId=null;$('placeForm').reset();$('placeDialogTitle').textContent='Add place';$('fid').value='';$('fbase').value='3.0';$('fopen24').checked=false;$('fclosed').value='';}
+async function editPlace(id){
+  try{const p=await api('/api/places/'+encodeURIComponent(id));resetPlaceForm();editingPlaceId=id;$('placeDialogTitle').textContent='Edit place';$('fid').value=p.id;$('fn').value=p.name||'';populateCitySelect(p.cityId);$('fk').value=p.category;$('fdesc').value=p.description||'';$('faddress').value=p.address||'';$('fphone').value=p.phone||'';$('fwebsite').value=p.website||'';$('flat').value=p.lat;$('flng').value=p.lng;$('fopens').value=p.opensAt||'';$('fcloses').value=p.closesAt||'';$('fopen24').checked=!!p.open24h;$('fclosed').value=(p.closedDays||[]).join(',');$('fhours').value=p.hoursText||'';$('fextra').value=p.extra||'';$('fbase').value=p.baseRating||p.avgRating||3;$('fstart').value=toLocalDate(p.eventStartsAt);$('fend').value=toLocalDate(p.eventEndsAt);$('dlg').showModal();}catch(e){notify(e.message,true);}
+}
+async function deletePlace(id){if(!confirm('Remove this place? This cannot be undone.'))return;try{await api('/api/admin/places/'+encodeURIComponent(id),{method:'DELETE'});await loadPlaces(placePageIndex>0&&places.length===1?placePageIndex-1:placePageIndex);await reloadDashboard();notify('Place removed.');}catch(e){notify(e.message,true);}}
+function openAdd(){resetPlaceForm();populateCitySelect();$('dlg').showModal();}
+async function savePlace(){
+  const name=$('fn').value.trim(),category=$('fk').value,cityId=$('fc').value;
+  if(!name||!cityId||!$('fdesc').value.trim()||!$('faddress').value.trim()){notify('Name, city, description and address are required.',true);return;}
+  const id=editingPlaceId||slugify($('fid').value.trim()||name);
+  if(!id){notify('Enter a valid place name.',true);return;}
+  const closed=$('fclosed').value.trim()?$('fclosed').value.split(',').map(x=>Number(x.trim())):[];
+  if(closed.some(x=>!Number.isInteger(x)||x<1||x>7)){notify('Closed days must be numbers from 1 to 7.',true);return;}
+  const start=$('fstart').value,end=$('fend').value;
+  if(category==='event'&&(!start||!end||new Date(end)<=new Date(start))){notify('Events need a valid start and end date.',true);return;}
+  const payload={id,cityId,category,name,description:$('fdesc').value.trim(),address:$('faddress').value.trim(),phone:$('fphone').value.trim(),website:$('fwebsite').value.trim(),lat:Number($('flat').value||0),lng:Number($('flng').value||0),opensAt:$('fopen24').checked?null:($('fopens').value||null),closesAt:$('fopen24').checked?null:($('fcloses').value||null),open24h:$('fopen24').checked,closedDays:closed,hoursText:$('fhours').value.trim(),extra:$('fextra').value.trim(),baseRating:Number($('fbase').value||3),eventStartsAt:category==='event'?fromLocalDate(start):null,eventEndsAt:category==='event'?fromLocalDate(end):null};
+  try{
+    const result=editingPlaceId?await api('/api/admin/places/'+encodeURIComponent(id),{method:'PUT',body:JSON.stringify(payload)}):await api('/api/admin/places',{method:'POST',body:JSON.stringify(payload)});
+    const files=Array.from($('fimages').files||[]);for(const file of files){const form=new FormData();form.append('file',file);await api('/api/admin/places/'+encodeURIComponent(id)+'/images',{method:'POST',body:form});}
+    $('dlg').close();await loadPlaces(placePageIndex);await reloadDashboard();notify(editingPlaceId?'Place updated.':'Place created.');
+  }catch(e){notify(e.message,true);}
+}
+function renderReviews(){
+  $('revList').innerHTML=reviews.length?reviews.map(r=>'<div class="rv"><div><b>'+esc(r.authorName||'User')+'</b> <span class="muted">on '+esc(r.placeName||r.placeId||'Place')+'</span><div class="stars">'+'★'.repeat(Math.max(0,Math.min(5,r.rating||0)))+'☆'.repeat(5-Math.max(0,Math.min(5,r.rating||0)))+'</div><div>'+esc(r.text)+'</div><div class="muted" style="font-size:12px">'+(r.createdAt?new Date(r.createdAt).toLocaleString():'')+'</div></div><button class="x" data-review-delete="'+esc(r.id)+'">Remove</button></div>').join(''):'<p class="muted">No reviews.</p>';
+  $('reviewBadge').textContent=reviews.length;
+  $('revList').querySelectorAll('[data-review-delete]').forEach(b=>b.onclick=async()=>{if(!confirm('Remove this review?'))return;try{await api('/api/admin/reviews/'+b.dataset.reviewDelete,{method:'DELETE'});reviews=reviews.filter(r=>r.id!==b.dataset.reviewDelete);renderReviews();await reloadDashboard();notify('Review removed.');}catch(e){notify(e.message,true);}});
+}
+function renderTeam(){ $('team').innerHTML=team.length?team.map(t=>'<div class="tm"><span class="aw"><span class="av">'+(t.avatar?'<img alt="" src="'+esc(mediaUrl(t.avatar))+'">':esc(initials(t.name)))+'</span></span><span class="tn">'+esc(t.name)+'</span><span class="tr">'+esc(t.role||'ADMIN')+'</span></div>').join(''):'<p class="muted">No admin team members were returned.</p>'; }
+async function reloadDashboard(){const data=await api('/api/admin/dashboard');renderDashboard(data);}
+async function loadAll(){
+  setLoading(true);
+  try{
+    const [account,summary,cityList,reviewList,teamList,me]=await Promise.all([
+      api('/api/admin/account'),api('/api/admin/dashboard'),api('/api/cities'),api('/api/admin/reviews'),api('/api/admin/team'),api('/api/me')
+    ]);
+    if(account.role!=='ADMIN'||me.role!=='ADMIN'){logoutLocal();location.href='login.html';return;}
+    adminAccount=account;adminMe=me;cities=cityList||[];reviews=reviewList||[];team=teamList||[];
+    renderAdminIdentity();renderDashboard(summary);renderCities();renderReviews();renderTeam();
+    $('prefEvents').checked=!!me.prefs.events;$('prefReviews').checked=!!me.prefs.reviews;$('prefNews').checked=!!me.prefs.news;
+    populateCitySelect();
+    await loadPlaces(0);
+    document.body.classList.remove('ld');setSection('dashboard');
+  }catch(e){setLoading(false);notify(e.message,true);if(!token())location.href='login.html';}
+}
+async function saveProfile(){
+  try{
+    const name=$('profileName').value.trim();if(name.length<2)throw new Error('Enter a valid name.');
+    adminMe=await api('/api/me',{method:'PATCH',body:JSON.stringify({name})});
+    const file=$('profileAvatar').files[0];if(file){const form=new FormData();form.append('file',file);adminMe=await api('/api/me/avatar',{method:'PUT',body:form});}
+    adminAccount={...adminAccount,name:adminMe.name,avatar:adminMe.avatarUrl};renderAdminIdentity();notify('Profile updated.');
+  }catch(e){notify(e.message,true);}
+}
+async function savePreferences(){
+  try{adminMe=await api('/api/me',{method:'PATCH',body:JSON.stringify({prefs:{events:$('prefEvents').checked,reviews:$('prefReviews').checked,news:$('prefNews').checked}})});notify('Notification preferences saved.');}
+  catch(e){notify(e.message,true);}
+}
+async function changePassword(){
+  const currentPassword=$('currentPassword').value,newPassword=$('newPassword').value,confirmPassword=$('confirmPassword').value;
+  try{const result=await api('/api/me/change-password',{method:'POST',body:JSON.stringify({currentPassword,newPassword,confirmPassword})});if(result.accessToken){localStorage.setItem(ACCESS_KEY,result.accessToken);localStorage.setItem(REFRESH_KEY,result.refreshToken);} $('passwordForm').reset();notify('Password changed. Please sign in again if asked.');}
+  catch(e){notify(e.message,true);}
+}
+async function sendNotification(){
+  const title=$('nt').value.trim(),message=$('nb').value.trim(),category=$('notificationCategory').value;
+  if(!title||!message){notify('Enter both a title and a message.',true);return;}
+  try{const result=await api('/api/admin/notifications',{method:'POST',body:JSON.stringify({category,title,message})});const el=document.createElement('div');el.className='rv';el.innerHTML='<div><b>'+esc(title)+'</b><div class="muted">'+esc(message)+'</div><div class="muted" style="font-size:12px">'+esc(category)+' · '+Number(result.recipients||0)+' recipients</div></div><span class="tag">Sent</span>';$('sent').prepend(el);$('nt').value='';$('nb').value='';notify('Notification sent to '+Number(result.recipients||0)+' users.');}
+  catch(e){notify(e.message,true);}
 }
 
-var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
-var $=function(i){return document.getElementById(i)};
-var I={
- grid:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
- pin:'<svg viewBox="0 0 24 24"><path d="M12 22s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>',
- star:'<svg viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>',
- bell:'<svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21h4"/></svg>',
- user:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
- lock:'<svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>',
- cog:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>',
- globe:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>'
-};
-
-/* ---------- sample data (replace with backend calls) ---------- */
-var attractions=[
- {n:'Grand Central Museum',c:'Lagos',k:'Attraction',r:4.7},
- {n:'Sunset Rooftop Grill',c:'Abuja',k:'Restaurant',r:4.5},
- {n:'Palm Bay Hotel',c:'Lagos',k:'Hotel',r:4.2},
- {n:'Jazz in the Park',c:'Abuja',k:'Event',r:4.8}
-];
-var reviews=[
- {u:'Tunde',t:'Great museum, very clean and friendly staff.',s:5,a:'Grand Central Museum'},
- {u:'Ngozi',t:'Food was nice but the wait was long.',s:3,a:'Sunset Rooftop Grill'},
- {u:'Ibrahim',t:'Loved the live music!',s:5,a:'Jazz in the Park'}
-];
-var weeks=['W1','W2','W3','W4','W5','W6','W7','W8'],views=[120,160,150,210,260,240,320,380],revs=[9,12,10,16,18,17,24,28];
-var cities=[['Lagos',82],['Abuja',64],['Port Harcourt',41],['Kano',28]];
-var activity=[['Tunde','left a 5-star review','2 min ago'],['Ngozi','added a favourite','18 min ago'],['Ibrahim','registered an account','1 hr ago'],['Chika','reset a password','3 hr ago']];
-
-/* ---------- sidebar ---------- */
-var main=[['dashboard','Dashboard','grid'],['attractions','Attractions','pin'],['reviews','Reviews','star'],['notify','Notifications','bell']];
-var sets=[['profile','Profile','user'],['security','Security','lock'],['preferences','Preferences','cog']];
-function navHTML(list){return list.map(function(x){var b=x[0]==='reviews'?'<span class="b">'+reviews.length+'</span>':'';return '<button class="nav" data-id="'+x[0]+'">'+I[x[2]]+'<span>'+x[1]+'</span>'+b+'</button>'}).join('')}
-$('nav1').innerHTML=navHTML(main);$('nav2').innerHTML=navHTML(sets);
-function setOpen(v){document.body.classList.toggle('open',v)}
-$('menu').onclick=function(){setOpen(!document.body.classList.contains('open'))};
-$('scrim').onclick=function(){setOpen(false)};
-document.addEventListener('keydown',function(e){if(e.key==='Escape')setOpen(false)});
-document.querySelectorAll('.nav').forEach(function(b){b.onclick=function(){go(b.dataset.id)}});
-function go(id){
-  document.querySelectorAll('main>section').forEach(function(s){s.hidden=s.id!==id});
-  document.querySelectorAll('.nav').forEach(function(b){b.classList.toggle('on',b.dataset.id===id)});
-  setOpen(false);window.scrollTo(0,0);
+/* ---------- places pagination ---------- */
+async function loadPlaces(page=placePageIndex){
+  const data=await api('/api/places?page='+page+'&size='+placePageSize+'&sort=rating');
+  places=(data&&data.items)||[];
+  placePageIndex=page;
+  placeHasNext=data&&data.totalPages!=null?(page+1)<data.totalPages:places.length===placePageSize;
+  renderPlaces();
+  $('pageInfo').textContent='Page '+(page+1)+(data&&data.totalPages!=null?' of '+Math.max(1,data.totalPages):'');
+  $('prevPage').disabled=page===0;
+  $('nextPage').disabled=!placeHasNext;
 }
-
-/* ---------- dashboard ---------- */
-function stats(){
-  var s=[['Total attractions',attractions.length,'+2 this month',I.pin],['Reviews',reviews.length,'+12 this week',I.star],['Registered users','1,284','+38 today',I.user],['Cities','4','Lagos, Abuja…',I.globe]];
-  $('stats').innerHTML=s.map(function(x){return '<div class="card stat"><div class="t"><span>'+x[0]+'</span><span class="ico">'+x[3]+'</span></div><p>'+x[1]+'</p><span class="muted" style="font-size:12px">'+x[2]+'</span></div>'}).join('');
+/* ---------- city management ---------- */
+function renderCities(){
+  $('cityRows').innerHTML=cities.length?cities.map(c=>'<tr><td><b>'+esc(c.name)+'</b></td><td>'+esc(c.country||'—')+'</td><td>'+Number(c.lat||0).toFixed(3)+', '+Number(c.lng||0).toFixed(3)+'</td><td><button class="btn" data-city-edit="'+esc(c.id)+'">Edit</button> <button class="x" data-city-delete="'+esc(c.id)+'">Remove</button></td></tr>').join(''):'<tr><td colspan="4" class="muted">No cities yet.</td></tr>';
+  $('cityRows').querySelectorAll('[data-city-edit]').forEach(b=>b.onclick=()=>openCityEdit(b.dataset.cityEdit));
+  $('cityRows').querySelectorAll('[data-city-delete]').forEach(b=>b.onclick=()=>deleteCity(b.dataset.cityDelete));
 }
-function chart(){
-  var W=600,H=220,p=28,mx=400,x=function(i){return p+i*(W-2*p)/7},y=function(v){return H-24-(v/mx)*(H-44)};
-  var line=function(d){return d.map(function(v,i){return (i?'L':'M')+x(i)+' '+y(v)}).join(' ')};
-  var r10=revs.map(function(v){return v*10});
-  var grid=[0,100,200,300,400].map(function(v){return '<line x1="'+p+'" x2="'+(W-p)+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="var(--border)" stroke-dasharray="3 3"/><text x="0" y="'+(y(v)+4)+'" font-size="10" fill="var(--muted)">'+v+'</text>'}).join('');
-  var lab=weeks.map(function(w,i){return '<text x="'+x(i)+'" y="'+(H-6)+'" font-size="10" text-anchor="middle" fill="var(--muted)">'+w+'</text>'}).join('');
-  $('chart').innerHTML='<svg class="ch" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Views and reviews per week"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--primary)" stop-opacity=".3"/><stop offset="1" stop-color="var(--primary)" stop-opacity="0"/></linearGradient></defs>'+grid+lab+
-   '<path d="'+line(views)+' L'+x(7)+' '+y(0)+' L'+x(0)+' '+y(0)+'Z" fill="url(#g)"/><path d="'+line(views)+'" fill="none" stroke="var(--primary)" stroke-width="2.5"/><path d="'+line(r10)+'" fill="none" stroke="var(--cor)" stroke-width="2" stroke-dasharray="5 4"/></svg>';
+function openCityAdd(){editingCityId=null;['cid','cname','ccountry','clat','clng','ctz','chue','cblurb','cdesc'].forEach(i=>$(i).value='');$('cid').disabled=false;$('cityDialogTitle').textContent='Add city';$('cityDlg').showModal();}
+function openCityEdit(id){const c=cities.find(x=>x.id===id);if(!c)return;editingCityId=id;$('cityDialogTitle').textContent='Edit city';$('cid').value=c.id;$('cid').disabled=true;$('cname').value=c.name||'';$('ccountry').value=c.country||'';$('clat').value=c.lat??'';$('clng').value=c.lng??'';$('ctz').value=c.timezone||'';$('chue').value=c.hue??'';$('cblurb').value=c.blurb||'';$('cdesc').value=c.description||'';$('cityDlg').showModal();}
+async function saveCity(){
+  const name=$('cname').value.trim(),country=$('ccountry').value.trim(),lat=$('clat').value,lng=$('clng').value;
+  if(!name||!country||lat===''||lng===''){notify('Name, country, latitude and longitude are required.',true);return;}
+  const id=editingCityId||slugify($('cid').value.trim()||name);
+  if(!id){notify('Enter a valid city name.',true);return;}
+  const payload={id,name,country,lat:Number(lat),lng:Number(lng),timezone:$('ctz').value.trim()||null,hue:$('chue').value===''?null:Number($('chue').value),blurb:$('cblurb').value.trim()||null,description:$('cdesc').value.trim()||null};
+  try{
+    if(editingCityId)await api('/api/admin/cities/'+encodeURIComponent(id),{method:'PUT',body:JSON.stringify(payload)});
+    else await api('/api/admin/cities',{method:'POST',body:JSON.stringify(payload)});
+    $('cityDlg').close();await refreshCities();notify(editingCityId?'City updated.':'City created.');
+  }catch(e){notify(e.message,true);}
 }
-function bento(){
-  var b=[
-   {t:'Attractions',m:attractions.length+' live',d:'Add, edit or remove attractions, restaurants, hotels and events.',i:I.pin,s:'Live',g:['Listings','Events'],w:1,k:1,to:'attractions'},
-   {t:'Reviews',m:reviews.length+' recent',d:'Moderate user ratings and comments.',i:I.star,s:'Updated',g:['Moderation'],to:'reviews'},
-   {t:'Notifications',m:'Push',d:'Send announcements and event reminders to app users.',i:I.bell,g:['Push','Alerts'],to:'notify'},
-   {t:'Cities',m:'4 cities',d:'Descriptions and images for each city in the app.',i:I.globe,s:'Beta',g:['Content','Images'],w:1,to:'attractions'}
-  ];
-  $('bento').innerHTML=b.map(function(x,n){return '<button class="bi'+(x.w?' wide':'')+(x.k?' keep':'')+'" data-to="'+x.to+'"><div class="row"><div class="ico">'+x.i+'</div><span class="chip">'+(x.s||'Active')+'</span></div><h4>'+x.t+'<small>'+x.m+'</small></h4><p>'+x.d+'</p><div class="row"><div>'+x.g.map(function(g){return '<span class="chip" style="margin-right:6px">#'+g+'</span>'}).join('')+'</div><span class="cta">Manage →</span></div></button>'}).join('');
-  document.querySelectorAll('.bi').forEach(function(e){e.onclick=function(){go(e.dataset.to)}});
+async function deleteCity(id){
+  if(!confirm('Remove this city? This cannot be undone.'))return;
+  try{await api('/api/admin/cities/'+encodeURIComponent(id),{method:'DELETE'});await refreshCities();await loadPlaces(placePageIndex);notify('City removed.');}catch(e){notify(e.message,true);}
 }
-function lists(){
-  $('cities').innerHTML=cities.map(function(c){return '<div class="item"><div class="r"><b>'+c[0]+'</b><span class="tag">'+c[1]+' listings</span></div><div class="r"><div class="prog"><i style="width:'+c[1]+'%"></i></div></div></div>'}).join('');
-  $('activity').innerHTML=activity.map(function(a){return '<div class="act"><div class="av">'+a[0][0]+'</div><p><b>'+a[0]+'</b> <span class="muted">'+a[1]+'</span><br><span class="muted" style="font-size:12px">'+a[2]+'</span></p></div>'}).join('');
+async function refreshCities(){cities=(await api('/api/cities'))||[];renderCities();populateCitySelect();await reloadDashboard();}
+function setupForms(){
+  $('add').onclick=openAdd;$('quick').onclick=openAdd;$('cancel').onclick=()=>$('dlg').close();$('save').onclick=savePlace;
+  $('send').onclick=sendNotification;$('profileSave').onclick=saveProfile;$('preferencesSave').onclick=savePreferences;$('passwordForm').onsubmit=e=>{e.preventDefault();changePassword();};
+  $('uploadCityCover').onclick=uploadCityCover;$('removeCityCover').onclick=removeCityCover;$('cityCoverSelect').onchange=renderCityCoverPreview;$('addCity').onclick=openCityAdd;$('citySave').onclick=saveCity;$('cityCancel').onclick=()=>$('cityDlg').close();$('prevPage').onclick=()=>loadPlaces(placePageIndex-1);$('nextPage').onclick=()=>loadPlaces(placePageIndex+1);
 }
-
-/* ---------- attractions CRUD ---------- */
-function rows(){
-  var q=($('q').value||'').toLowerCase();
-  $('rows').innerHTML=attractions.map(function(a,i){return a.n.toLowerCase().indexOf(q)<0?'':'<tr><td><b>'+esc(a.n)+'</b></td><td>'+esc(a.c)+'</td><td><span class="tag">'+esc(a.k)+'</span></td><td>★ '+a.r+'</td><td><button class="x" data-i="'+i+'">Remove</button></td></tr>'}).join('')||'<tr><td colspan="5" class="muted">No listings found.</td></tr>';
-  document.querySelectorAll('#rows .x').forEach(function(b){b.onclick=function(){attractions.splice(+b.dataset.i,1);refresh()}});
-}
-$('q').oninput=function(){go('attractions');rows()};
-function openAdd(){setOpen(false);$('dlg').showModal()}
-$('add').onclick=openAdd;$('quick').onclick=openAdd;$('cancel').onclick=function(){$('dlg').close()};
-$('save').onclick=function(){
-  var n=$('fn').value.trim();if(!n)return;
-  attractions.unshift({n:n,c:$('fc').value.trim()||'—',k:$('fk').value,r:0});
-  $('fn').value='';$('fc').value='';$('dlg').close();refresh();go('attractions');
-};
-
-/* ---------- reviews & notifications ---------- */
-function revs_(){
-  $('revList').innerHTML=reviews.map(function(r,i){return '<div class="rv"><div><b>'+esc(r.u)+'</b> <span class="muted">on '+esc(r.a)+'</span><div class="stars">'+'★'.repeat(r.s)+'☆'.repeat(5-r.s)+'</div><div>'+esc(r.t)+'</div></div><button class="x" data-i="'+i+'">Remove</button></div>'}).join('')||'<p class="muted">No reviews.</p>';
-  document.querySelectorAll('#revList .x').forEach(function(b){b.onclick=function(){reviews.splice(+b.dataset.i,1);refresh()}});
-}
-$('send').onclick=function(){
-  var t=$('nt').value.trim(),m=$('nb').value.trim();if(!t)return;
-  var el=document.createElement('div');el.className='rv';el.innerHTML='<div><b>'+esc(t)+'</b><div class="muted">'+esc(m)+'</div></div><span class="tag">Sent</span>';
-  var s=$('sent');if(s.querySelector('p'))s.innerHTML='';s.prepend(el);$('nt').value='';$('nb').value='';
-};
-function refresh(){stats();bento();rows();revs_();var b=document.querySelector('[data-id="reviews"] .b');if(b)b.textContent=reviews.length}
-
-/* ---------- theme + init ---------- */
-$('theme').onclick=function(){var r=document.documentElement,d=r.dataset.theme==='dark'||(!r.dataset.theme&&matchMedia('(prefers-color-scheme:dark)').matches);r.dataset.theme=d?'light':'dark'};
-function paint(el,a){el.innerHTML=a.avatar?'<img alt="'+esc(a.name)+'" src="'+esc(a.avatar)+'">':'';var im=el.querySelector('img');var ini=a.name.split(' ').map(function(w){return w[0]}).join('').slice(0,2).toUpperCase();if(im)im.onerror=function(){el.textContent=ini};else el.textContent=ini}
-loadAdmin().then(function(a){
-  $('welcome').textContent='Welcome back, '+a.name.split(' ')[0];
-  $('nm').textContent=$('nm2').textContent=a.name;$('em').textContent=$('em2').textContent=a.email;
-  ['avTop','avSide','avBig'].forEach(function(id){paint($(id),a)});Promise.all([window.cgTeam?cgTeam(a):0,new Promise(function(r){setTimeout(r,500)})]).then(function(){document.body.classList.remove('ld')});
-});
-chart();lists();refresh();go('dashboard');
-/* ---- team, projects, logout, chart tooltip ---- */
-(function(){
- var ini=function(n){return n.split(' ').map(function(w){return w[0]}).join('')};
- /* backend: set TEAM_API to a GET endpoint returning [{name,email,avatar,role}] for every admin who has logged in */
- var TEAM_API=null;
- async function cgTeam(me){
-  var list=[];
-  try{if(TEAM_API){var r=await fetch(TEAM_API,{credentials:'include'});if(r.ok)list=await r.json()}else{list=JSON.parse(localStorage.getItem('cg_admins')||'[]')}}catch(e){}
-  if(!TEAM_API){
-   list=list.filter(function(x){return x.email!==me.email});
-   list.unshift({name:me.name,email:me.email,avatar:me.avatar||'',role:me.role||'Admin'});list=list.slice(0,8);
-   try{localStorage.setItem('cg_admins',JSON.stringify(list))}catch(e){}
-  }
-  $('team').innerHTML=list.map(function(t){return '<div class="tm"><span class="aw"><span class="av" data-i="'+esc(ini(t.name))+'">'+(t.avatar?'<img alt="" src="'+esc(t.avatar)+'" onerror="this.parentNode.textContent=this.parentNode.dataset.i">':esc(ini(t.name)))+'</span>'+(t.email===me.email?'<i class="onl"></i>':'')+'</span><span class="tn">'+esc(t.name)+'</span><span class="tr">'+esc(t.role||'Admin')+'</span></div>'}).join('');
- }
- window.cgTeam=cgTeam;
- var pj=[{n:'Lagos city page refresh',d:'Update descriptions and photos',s:'In progress',c:'b-in',p:75,due:'Dec 15',w:['Tunde Bello','Ngozi Eze','Chika Obi']},{n:'Abuja events calendar',d:'Add upcoming events',s:'Planning',c:'b-pl',p:45,due:'Jan 20',w:['Ibrahim Musa','Chika Obi']},{n:'Review moderation pass',d:'Clear flagged reviews',s:'In review',c:'b-rv',p:90,due:'Dec 02',w:['Ngozi Eze']}];
- $('projects').innerHTML=pj.map(function(p){return '<div class="pj"><div class="t"><h4>'+p.n+'</h4><span class="bdg '+p.c+'">'+p.s+'</span></div><p>'+p.d+'</p><div class="pb"><div class="prog"><i style="width:'+p.p+'%"></i></div><span>'+p.p+'%</span></div><div class="t"><span class="stk">'+p.w.map(function(w){return '<span class="av" title="'+w+'">'+ini(w)+'</span>'}).join('')+'</span><span class="muted" style="font-size:12px">Due '+p.due+'</span></div></div>'}).join('');
- /* logout: call your backend logout endpoint here, then redirect to the login page */
- $('logout').onclick=function(){var s=this.querySelector('span');s.textContent='Logged out';setTimeout(function(){s.textContent='Log out'},1500);setTimeout(function(){setOpen(false)},900)};
- /* desktop rail: collapse after picking an item */
- var side=$('side');
- side.addEventListener('click',function(e){if(e.target.closest('.nav')){side.classList.add('shut');if(document.activeElement)document.activeElement.blur()}});
- side.addEventListener('mouseleave',function(){side.classList.remove('shut')});
- side.addEventListener('keyup',function(e){if(e.key==='Tab')side.classList.remove('shut')});
- document.addEventListener('pointerdown',function(e){if(!side.contains(e.target))side.classList.remove('shut')});
- /* chart hover tooltip */
- N=168;hov=0;neg=[];weeks=['-7m','-6m','-5m','-4m','-3m','-2m','-1m','now'];drawChart();var box=$('chart'),tip=document.createElement('div');tip.className='tip';box.style.position='relative';box.appendChild(tip);
- function hide(){var o=box.querySelector('#ov');if(o)o.innerHTML='';tip.classList.remove('on')}
- function show(e){
-  var svg=box.querySelector('svg');if(!svg)return;
-  var r=svg.getBoundingClientRect(),i=Math.round(((e.clientX-r.left)/r.width*600-28)*7/544);i=Math.max(0,Math.min(7,i));
-  var X=28+i*544/7,yv=196-views[i]/400*176,yr=196-revs[i]*10/400*176,o=svg.querySelector('#ov');
-  if(!o){o=document.createElementNS('http://www.w3.org/2000/svg','g');o.id='ov';svg.appendChild(o)}
-  o.innerHTML='<line x1="'+X+'" x2="'+X+'" y1="20" y2="196" stroke="var(--border)"/><circle cx="'+X+'" cy="'+yv+'" r="5" fill="var(--primary)" stroke="var(--card)" stroke-width="2"/><circle cx="'+X+'" cy="'+yr+'" r="5" fill="var(--cor)" stroke="var(--card)" stroke-width="2"/>';
-  tip.innerHTML='<b>'+weeks[i]+'</b><div><i style="background:var(--primary)"></i>Views<span>'+views[i]+'</span></div><div><i style="background:var(--cor)"></i>Reviews<span>'+revs[i]+'</span></div>';
-  tip.classList.add('on');
-  var px=X/600*r.width;tip.style.top=(Math.min(yv,yr)/220*r.height+14)+'px';tip.style.left=(px>r.width/2?px-14-tip.offsetWidth:px+14)+'px';
- }
- function drawChart(){
-  var out='',Y=196,K=176;
-  [0,200,400].forEach(function(v){var y=Y-v/400*K;out+='<line x1="34" x2="594" y1="'+y+'" y2="'+y+'" stroke="var(--border)"/><text x="0" y="'+(y+4)+'" font-size="10" fill="var(--muted)">'+v+'</text>'});
-  views.forEach(function(v,i){
-   var cx=69+i*70,hv=v/400*K,hr=revs[i]*10/400*K;
-   out+='<g class="cg'+(i===7?' on':'')+'" data-i="'+i+'"><rect class="cb" style="--i:'+i+'" x="'+(cx-20)+'" y="'+(Y-hv)+'" width="24" height="'+hv+'" rx="12" fill="var(--primary)"/><rect class="cb" style="--i:'+i+'" x="'+(cx+8)+'" y="'+(Y-hr)+'" width="10" height="'+hr+'" rx="5" fill="var(--cor)"/><text class="cl" x="'+(cx-8)+'" y="'+(Y-hv-8)+'" font-size="11" font-weight="600" text-anchor="middle" fill="var(--fg)">'+v+'</text></g><text x="'+cx+'" y="214" font-size="10" text-anchor="middle" fill="var(--muted)">'+weeks[i]+'</text>';
-  });
-  $('chart').innerHTML='<svg class="ch" viewBox="0 0 600 220" role="img" aria-label="Listing views and reviews per week">'+out+'</svg>';
- }
- function setOn(i){box.querySelectorAll('.cg').forEach(function(g){g.classList.toggle('on',+g.dataset.i===i)})}
- function bshow(e){
-  var svg=box.querySelector('svg');if(!svg)return;
-  var r=svg.getBoundingClientRect(),i=Math.floor(((e.clientX-r.left)/r.width*600-34)/70);i=Math.max(0,Math.min(7,i));
-  setOn(i);
-  tip.innerHTML='<b>'+weeks[i]+'</b><div><i style="background:var(--primary)"></i>Views<span>'+views[i]+'</span></div><div><i style="background:var(--cor)"></i>Reviews<span>'+revs[i]+'</span></div>';
-  tip.classList.add('on');
-  var px=(69+i*70)/600*r.width,py=(196-views[i]/400*176)/220*r.height;
-  tip.style.top=Math.max(0,py-tip.offsetHeight-26)+'px';
-  tip.style.left=Math.min(Math.max(0,px-tip.offsetWidth/2),r.width-tip.offsetWidth)+'px';
- }
- function bhide(){setOn(7);tip.classList.remove('on')}
- box.addEventListener('pointermove',bshow);box.addEventListener('pointerleave',bhide);
- /* ---- live chart ---- */
- var dv,dr,raf;
- function drawChart(){
-  dv=views.slice();dr=revs.slice();
-  var out='',Y=196,K=176;
-  [0,200,400].forEach(function(v){var y=Y-v/400*K;out+='<line x1="34" x2="594" y1="'+y+'" y2="'+y+'" stroke="var(--border)"/><text x="0" y="'+(y+4)+'" font-size="10" fill="var(--muted)">'+v+'</text>'});
-  views.forEach(function(v,i){var cx=69+i*70;
-   out+='<g class="cg'+(i===7?' on':'')+'" data-i="'+i+'"><rect class="cb" style="--i:'+i+'" x="'+(cx-20)+'" width="24" rx="12" fill="var(--primary)"/><rect class="cb" style="--i:'+i+'" x="'+(cx+8)+'" width="10" rx="5" fill="var(--cor)"/><text class="cl" x="'+(cx-8)+'" font-size="11" font-weight="600" text-anchor="middle" fill="var(--fg)"></text></g><text x="'+cx+'" y="214" font-size="10" text-anchor="middle" fill="var(--muted)">'+weeks[i]+'</text>';
-  });
-  $('chart').innerHTML='<svg class="ch" viewBox="0 0 600 220" role="img" aria-label="Live listing views and reviews per minute">'+out+'</svg>';
-  paintAll();
- }
- function paintAll(){
-  var Y=196,K=176,gs=$('chart').querySelectorAll('.cg');
-  for(var i=0;i<gs.length;i++){var a=gs[i].children,hv=dv[i]/400*K,hr=dr[i]*10/400*K;
-   a[0].setAttribute('y',Y-hv);a[0].setAttribute('height',hv);
-   a[1].setAttribute('y',Y-hr);a[1].setAttribute('height',hr);
-   a[2].setAttribute('y',Y-hv-8);a[2].textContent=Math.round(dv[i]);}
- }
- function bshow(e){
-  var svg=box.querySelector('svg');if(!svg)return;
-  var r=svg.getBoundingClientRect(),i=Math.floor(((e.clientX-r.left)/r.width*600-34)/70);i=Math.max(0,Math.min(7,i));
-  setOn(i);
-  tip.innerHTML='<b>'+weeks[i]+'</b><div><i style="background:var(--primary)"></i>Views<span>'+Math.round(views[i])+'</span></div><div><i style="background:var(--cor)"></i>Reviews<span>'+Math.round(revs[i])+'</span></div>';
-  tip.classList.add('on');
-  var px=(69+i*70)/600*r.width,py=(196-views[i]/400*176)/220*r.height;
-  tip.style.top=Math.max(0,py-tip.offsetHeight-26)+'px';
-  tip.style.left=Math.min(Math.max(0,px-tip.offsetWidth/2),r.width-tip.offsetWidth)+'px';
- }
- function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
- function rnd(a,b){return a+Math.random()*(b-a)}
- function morph(){
-  cancelAnimationFrame(raf);var a=dv.slice(),b=dr.slice(),t0=null;
-  function f(t){if(t0===null)t0=t;var p=Math.min(1,(t-t0)/700),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
-   dv=a.map(function(v,i){return v+(views[i]-v)*e});dr=b.map(function(v,i){return v+(revs[i]-v)*e});paintAll();if(p<1)raf=requestAnimationFrame(f)}
-  raf=requestAnimationFrame(f);
- }
- /* demo live feed: replace with real data from your backend (update views[] and revs[], then call morph()) */
- var n=0;
- setInterval(function(){
-  n++;
-  if(n%4===0){views.shift();revs.shift();views.push(clamp(views[6]+rnd(-30,40),140,380));revs.push(clamp(revs[6]+rnd(-3,3),6,27))}
-  else{views[7]=clamp(views[7]+rnd(-22,26),120,395);revs[7]=clamp(revs[7]+rnd(-2,2),4,28)}
-  morph();
- },1400);
- $('chart').parentNode.querySelector('h3').insertAdjacentHTML('beforeend','<span class="live"><i></i>Live</span>');
- /* top bar: transparent at the top, glass once you scroll */
- var hdr=document.querySelector('header');
- window.addEventListener('scroll',function(){hdr.classList.toggle('top',window.scrollY<8)},{passive:true});
- /* ---- smooth dotted area chart (replaces the bar chart) ---- */
- function pathOf(vals,k){
-  var p=vals.map(function(v,i){return [34+i*80,196-v*k/400*176]}),d='M'+p[0][0]+' '+p[0][1];
-  for(var i=0;i<p.length-1;i++){
-   var p0=p[i-1]||p[i],p1=p[i],p2=p[i+1],p3=p[i+2]||p2;
-   var y1=Math.min(196,Math.max(20,p1[1]+(p2[1]-p0[1])/6)),y2=Math.min(196,Math.max(20,p2[1]-(p3[1]-p1[1])/6));
-   d+=' C'+(p1[0]+(p2[0]-p0[0])/6)+' '+y1+' '+(p2[0]-(p3[0]-p1[0])/6)+' '+y2+' '+p2[0]+' '+p2[1];
-  }
-  return d;
- }
- function drawChart(){
-  dv=views.slice();dr=revs.slice();
-  var g='',lb='';
-  [0,200,400].forEach(function(v){var y=196-v/400*176;g+='<line x1="34" x2="594" y1="'+y+'" y2="'+y+'" stroke="var(--border)" stroke-dasharray="3 5"/><text x="0" y="'+(y+4)+'" font-size="10" fill="var(--muted)">'+v+'</text>'});
-  weeks.forEach(function(w,i){lb+='<text x="'+(34+i*80)+'" y="214" font-size="10" text-anchor="middle" fill="var(--muted)">'+w+'</text>'});
-  $('chart').innerHTML='<svg class="ch" viewBox="0 0 600 220" role="img" aria-label="Live listing views and reviews per minute"><defs><pattern id="dtv" width="3.4" height="3.4" patternUnits="userSpaceOnUse"><circle cx="1.7" cy="1.7" r="1" fill="var(--pt)"/></pattern><pattern id="dtr" width="3.4" height="3.4" patternUnits="userSpaceOnUse"><circle cx="1.7" cy="1.7" r="1" fill="var(--cor)"/></pattern></defs>'+g+lb+'<path id="av" fill="url(#dtv)" opacity=".5"/><path id="ar" fill="url(#dtr)" opacity=".55"/><path id="lv" fill="none" stroke="var(--pt)" stroke-width="2.6" stroke-linecap="round"/><path id="lr" fill="none" stroke="var(--cor)" stroke-width="2.2" stroke-linecap="round"/><circle id="ring" class="ping" cx="594" r="5" fill="none" stroke="var(--pt)" stroke-width="1.5"/><circle id="dot" cx="594" r="5" fill="var(--pt)"/><g id="ov"></g></svg>';
-  paintAll();
- }
- function paintAll(){
-  var s=$('chart'),a=pathOf(dv,1),b=pathOf(dr,10),cy=196-dv[7]/400*176,z=' L594 196 L34 196Z';
-  s.querySelector('#lv').setAttribute('d',a);s.querySelector('#av').setAttribute('d',a+z);
-  s.querySelector('#lr').setAttribute('d',b);s.querySelector('#ar').setAttribute('d',b+z);
-  s.querySelector('#dot').setAttribute('cy',cy);s.querySelector('#ring').setAttribute('cy',cy);
- }
- function bshow(e){
-  var svg=box.querySelector('svg');if(!svg)return;
-  var r=svg.getBoundingClientRect(),i=Math.round(((e.clientX-r.left)/r.width*600-34)/80);i=Math.max(0,Math.min(7,i));
-  var X=34+i*80,yv=196-dv[i]/400*176,yr=196-dr[i]*10/400*176;
-  svg.querySelector('#ov').innerHTML='<line x1="'+X+'" x2="'+X+'" y1="20" y2="196" stroke="var(--border)"/><circle cx="'+X+'" cy="'+yv+'" r="5" fill="var(--pt)" stroke="var(--card)" stroke-width="2"/><circle cx="'+X+'" cy="'+yr+'" r="5" fill="var(--cor)" stroke="var(--card)" stroke-width="2"/>';
-  tip.innerHTML='<b>'+weeks[i]+'</b><div><i style="background:var(--pt)"></i>Views<span>'+Math.round(dv[i])+'</span></div><div><i style="background:var(--cor)"></i>Reviews<span>'+Math.round(dr[i])+'</span></div>';
-  tip.classList.add('on');
-  var px=X/600*r.width;tip.style.top=(Math.min(yv,yr)/220*r.height+14)+'px';tip.style.left=(px>r.width/2?px-14-tip.offsetWidth:px+14)+'px';
- }
- function bhide(){var o=box.querySelector('#ov');if(o)o.innerHTML='';tip.classList.remove('on')}
- /* ---- live price-style line chart (final version) ---- */
- var pts,N=168,hov=0;
- function yv(v){return 206-(v-50)/350*192}
- function xv(i){return 34+i*560/(N-1)}
- function nextVal(p){return clamp(p+rnd(-18,18)+(250-p)*.04,70,385)}
- function drawChart(){
-  if(!pts){pts=[];var v=250;for(var i=0;i<N;i++){v=nextVal(v);pts.push(v)}}
-  var g='';
-  [100,200,300,400].forEach(function(v){var y=yv(v);g+='<line x1="34" x2="594" y1="'+y+'" y2="'+y+'" stroke="var(--border)" stroke-dasharray="3 5"/><text x="0" y="'+(y+4)+'" font-size="10" fill="var(--muted)">'+v+'</text>'});
-  $('chart').innerHTML='<svg class="ch" viewBox="0 0 600 220" role="img" aria-label="Live listing views"><defs><linearGradient id="gv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--pt)" stop-opacity=".3"/><stop offset="1" stop-color="var(--pt)" stop-opacity="0"/></linearGradient></defs>'+g+'<path id="av" fill="url(#gv)"/><path id="lv" fill="none" stroke="var(--pt)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><g id="ov"></g></svg>';
-  paintAll();
- }
- function paintAll(){
-  var s=$('chart'),d=pts.map(function(v,i){return(i?'L':'M')+xv(i).toFixed(1)+' '+yv(v).toFixed(1)}).join(' ');
-  s.querySelector('#lv').setAttribute('d',d);s.querySelector('#av').setAttribute('d',d+' L594 206 L34 206Z');
- }
- function bshow(e){
-  var svg=box.querySelector('svg');if(!svg)return;hov=1;
-  var r=svg.getBoundingClientRect(),i=Math.round(((e.clientX-r.left)/r.width*600-34)*(N-1)/560);i=Math.max(0,Math.min(N-1,i));
-  var X=xv(i),Y=yv(pts[i]);
-  svg.querySelector('#ov').innerHTML='<line x1="'+X+'" x2="'+X+'" y1="14" y2="206" stroke="var(--pt)" stroke-width="1.5" stroke-dasharray="4 4"/><line x1="34" x2="594" y1="'+Y+'" y2="'+Y+'" stroke="var(--pt)" stroke-width="1.5" stroke-dasharray="4 4"/><circle cx="'+X+'" cy="'+Y+'" r="4" fill="var(--pt)" stroke="var(--card)" stroke-width="2"/>';
-  tip.innerHTML='<div>Views<span>'+Math.round(pts[i]).toLocaleString()+'</span></div><div>Point<span>'+(i+1)+'/'+N+'</span></div>';
-  tip.classList.add('on');
-  var px=X/600*r.width;
-  tip.style.top=Math.min(Y/220*r.height+16,r.height-tip.offsetHeight)+'px';
-  tip.style.left=(px>r.width/2?px-16-tip.offsetWidth:px+16)+'px';
- }
- function bhide(){hov=0;var o=box.querySelector('#ov');if(o)o.innerHTML='';tip.classList.remove('on')}
- function morph(){}
- setInterval(function(){if(hov)return;pts.shift();pts.push(nextVal(pts[pts.length-1]));paintAll()},400);
- /* ---- diverging chart: views above the line, bounces below ---- */
- function Y1(v){return 112-v/400*98}
- function Y2(n){return 112+n/200*98}
- function nextVal(p){var v=clamp(p+rnd(-18,18)+(250-p)*.04,70,385),l=neg.length?neg[neg.length-1]:90;neg.push(clamp(l+rnd(-9,9)+(90-l)*.05-(v-p)*.05,15,170));if(neg.length>N)neg.shift();return v}
- function drawChart(){
-  if(!pts){pts=[];neg=[];var v=250;for(var i=0;i<N;i++){v=nextVal(v);pts.push(v)}}
-  var g='',lab=function(y,t){return '<text x="0" y="'+(y+4)+'" font-size="10" fill="var(--muted)">'+t+'</text>'};
-  [[400,'400',Y1],[200,'200',Y1],[100,'−100',Y2],[200,'−200',Y2]].forEach(function(a){var y=a[2](a[0]);g+='<line x1="34" x2="594" y1="'+y+'" y2="'+y+'" stroke="var(--border)" stroke-dasharray="3 5"/>'+lab(y,a[1])});
-  g+='<line x1="34" x2="594" y1="112" y2="112" stroke="var(--muted)" stroke-opacity=".5"/>'+lab(112,'0');
-  $('chart').innerHTML='<svg class="ch" viewBox="0 0 600 220" role="img" aria-label="Live listing views above the line and bounces below it"><defs><linearGradient id="gp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--pt)" stop-opacity=".3"/><stop offset="1" stop-color="var(--pt)" stop-opacity="0"/></linearGradient><linearGradient id="gn" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="var(--cor)" stop-opacity=".3"/><stop offset="1" stop-color="var(--cor)" stop-opacity="0"/></linearGradient></defs>'+g+'<text x="40" y="26" font-size="10" font-weight="600" fill="var(--pt)">Views</text><text x="40" y="206" font-size="10" font-weight="600" fill="var(--cor)">Bounces</text><path id="ap" fill="url(#gp)"/><path id="an" fill="url(#gn)"/><path id="lp" fill="none" stroke="var(--pt)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><path id="ln" fill="none" stroke="var(--cor)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><g id="ov"></g></svg>';
-  paintAll();
- }
- function paintAll(){
-  var s=$('chart'),p='',q='',z='L594 112 L34 112Z';
-  for(var i=0;i<N;i++){var x=xv(i).toFixed(1);p+=(i?'L':'M')+x+' '+Y1(pts[i]).toFixed(1)+' ';q+=(i?'L':'M')+x+' '+Y2(neg[i]).toFixed(1)+' '}
-  s.querySelector('#lp').setAttribute('d',p);s.querySelector('#ap').setAttribute('d',p+z);
-  s.querySelector('#ln').setAttribute('d',q);s.querySelector('#an').setAttribute('d',q+z);
- }
- function bshow(e){
-  var svg=box.querySelector('svg');if(!svg)return;hov=1;
-  var r=svg.getBoundingClientRect(),i=Math.round(((e.clientX-r.left)/r.width*600-34)*(N-1)/560);i=Math.max(0,Math.min(N-1,i));
-  var X=xv(i),yp=Y1(pts[i]),yn=Y2(neg[i]);
-  svg.querySelector('#ov').innerHTML='<line x1="'+X+'" x2="'+X+'" y1="14" y2="210" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 4"/><circle cx="'+X+'" cy="'+yp+'" r="4" fill="var(--pt)" stroke="var(--card)" stroke-width="2"/><circle cx="'+X+'" cy="'+yn+'" r="4" fill="var(--cor)" stroke="var(--card)" stroke-width="2"/>';
-  tip.innerHTML='<div>Views<span>'+Math.round(pts[i]).toLocaleString()+'</span></div><div>Bounces<span>'+Math.round(neg[i]).toLocaleString()+'</span></div><div>Point<span>'+(i+1)+'/'+N+'</span></div>';
-  tip.classList.add('on');
-  var px=X/600*r.width;tip.style.top=Math.min(112/220*r.height+10,r.height-tip.offsetHeight)+'px';tip.style.left=(px>r.width/2?px-16-tip.offsetWidth:px+16)+'px';
- }
- function bhide(){hov=0;var o=box.querySelector('#ov');if(o)o.innerHTML='';tip.classList.remove('on')}
- /* both lines share one chart: main views (teal) and bounces (coral) */
- function yy(v){return 206-v/400*192}
- function drawChart(){
-  if(!pts){pts=[];neg=[];var v=250;for(var i=0;i<N;i++){v=nextVal(v);pts.push(v)}}
-  var g='';
-  [100,200,300,400].forEach(function(v){var y=yy(v);g+='<line x1="34" x2="594" y1="'+y+'" y2="'+y+'" stroke="var(--border)" stroke-dasharray="3 5"/><text x="0" y="'+(y+4)+'" font-size="10" fill="var(--muted)">'+v+'</text>'});
-  $('chart').innerHTML='<svg class="ch" viewBox="0 0 600 220" role="img" aria-label="Live listing views and bounces"><defs><linearGradient id="gp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--pt)" stop-opacity=".3"/><stop offset="1" stop-color="var(--pt)" stop-opacity="0"/></linearGradient><linearGradient id="gn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--cor)" stop-opacity=".18"/><stop offset="1" stop-color="var(--cor)" stop-opacity="0"/></linearGradient></defs>'+g+'<circle cx="44" cy="20" r="3.5" fill="var(--pt)"/><text x="52" y="24" font-size="10" font-weight="600" fill="var(--fg)">Views</text><circle cx="100" cy="20" r="3.5" fill="var(--cor)"/><text x="108" y="24" font-size="10" font-weight="600" fill="var(--fg)">Bounces</text><path id="an" fill="url(#gn)"/><path id="ap" fill="url(#gp)"/><path id="ln" fill="none" stroke="var(--cor)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path id="lp" fill="none" stroke="var(--pt)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><g id="ov"></g></svg>';
-  paintAll();
- }
- function paintAll(){
-  var s=$('chart'),p='',q='',z='L594 206 L34 206Z';
-  for(var i=0;i<N;i++){var x=xv(i).toFixed(1);p+=(i?'L':'M')+x+' '+yy(pts[i]).toFixed(1)+' ';q+=(i?'L':'M')+x+' '+yy(neg[i]).toFixed(1)+' '}
-  s.querySelector('#lp').setAttribute('d',p);s.querySelector('#ap').setAttribute('d',p+z);
-  s.querySelector('#ln').setAttribute('d',q);s.querySelector('#an').setAttribute('d',q+z);
- }
- function bshow(e){
-  var svg=box.querySelector('svg');if(!svg)return;hov=1;
-  var r=svg.getBoundingClientRect(),i=Math.round(((e.clientX-r.left)/r.width*600-34)*(N-1)/560);i=Math.max(0,Math.min(N-1,i));
-  var X=xv(i),yp=yy(pts[i]),yn=yy(neg[i]);
-  svg.querySelector('#ov').innerHTML='<line x1="'+X+'" x2="'+X+'" y1="14" y2="206" stroke="var(--pt)" stroke-width="1.5" stroke-dasharray="4 4"/><line x1="34" x2="594" y1="'+yp+'" y2="'+yp+'" stroke="var(--pt)" stroke-width="1.5" stroke-dasharray="4 4"/><circle cx="'+X+'" cy="'+yp+'" r="4" fill="var(--pt)" stroke="var(--card)" stroke-width="2"/><circle cx="'+X+'" cy="'+yn+'" r="4" fill="var(--cor)" stroke="var(--card)" stroke-width="2"/>';
-  tip.innerHTML='<div>Views<span>'+Math.round(pts[i]).toLocaleString()+'</span></div><div>Bounces<span>'+Math.round(neg[i]).toLocaleString()+'</span></div><div>Point<span>'+(i+1)+'/'+N+'</span></div>';
-  tip.classList.add('on');
-  var px=X/600*r.width;tip.style.top=Math.min(yp/220*r.height+16,r.height-tip.offsetHeight)+'px';tip.style.left=(px>r.width/2?px-16-tip.offsetWidth:px+16)+'px';
- }
- function paintAllOld(){
-  var s=$('chart'),up='',dn='',full='';
-  for(var i=0;i<N;i++){
-   var x=xv(i).toFixed(1),y=yv(pts[i]).toFixed(1);
-   full+=(i?'L':'M')+x+' '+y+' ';
-   if(i){var seg='M'+xv(i-1).toFixed(1)+' '+yv(pts[i-1]).toFixed(1)+' L'+x+' '+y+' ';if(pts[i]>=pts[i-1])up+=seg;else dn+=seg}
-  }
-  var ld=s.querySelector('#ld');
-  if(!ld){ld=document.createElementNS('http://www.w3.org/2000/svg','path');ld.id='ld';ld.setAttribute('fill','none');ld.setAttribute('stroke','var(--cor)');ld.setAttribute('stroke-width','2.2');ld.setAttribute('stroke-linecap','round');s.querySelector('#lv').after(ld)}
-  s.querySelector('#lv').setAttribute('d',up);ld.setAttribute('d',dn);
-  s.querySelector('#av').setAttribute('d',full+'L594 206 L34 206Z');
- }
-})();
-/* ---- tuck-away details + ink spill theme transition ---- */
-(function(){
- var m=$('more'),t=$('tuck');
- m.onclick=function(){var o=t.classList.toggle('open');m.setAttribute('aria-expanded',o);m.setAttribute('aria-label',o?'Show less':'Show more')};
- var TAU=Math.PI*2,FREQS=[3,5,8,13,21,34,55,89,144,233],ROUGH=.22;
- function mulberry32(seed){var a=seed>>>0;return function(){a=(a+0x6d2b79f5)>>>0;var t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296}}
- function makeInk(seed){
-  var r=mulberry32(seed),i,harmonics=FREQS.map(function(k){return[k,(.6+r()*.8)/Math.pow(k,.55),r()*TAU,(r()-.5)*9]}),sum=0;
-  harmonics.forEach(function(h){sum+=h[1]});harmonics.forEach(function(h){h[1]*=ROUGH/sum});
-  var tendrils=[],drops=[];
-  for(i=0;i<70;i++)tendrils.push([r()*TAU,.005+r()*.018,.015+Math.pow(r(),1.6)*.14,r()*.7]);
-  for(i=0;i<9;i++)tendrils.push([r()*TAU,.014+r()*.03,.12+r()*.22,r()*.45]);
-  for(i=0;i<130;i++)drops.push([r()*TAU,.05+r()*1,.0012+Math.pow(r(),2.6)*.009,1+r()*2.2]);
-  return{harmonics:harmonics,tendrils:tendrils,drops:drops,dip:ROUGH};
- }
- function wrap(a){a=a%TAU;return a>Math.PI?a-TAU:a<-Math.PI?a+TAU:a}
- function rimAt(ink,a,R,p){
-  var n=0,spike=0,i,h,t,grow,d;
-  for(i=0;i<ink.harmonics.length;i++){h=ink.harmonics[i];n+=h[1]*Math.sin(h[0]*a+h[2]+h[3]*p)}
-  for(i=0;i<ink.tendrils.length;i++){t=ink.tendrils[i];grow=Math.min(1,Math.max(0,(p-t[3])/.3));if(grow<=0)continue;d=wrap(a-t[0])/t[1];if(d>3||d<-3)continue;spike+=t[2]*grow*Math.exp(-d*d)}
-  return R*(1+n+spike);
- }
- function coverRadius(ink,ox,oy,w,h){var far=Math.max(Math.hypot(ox,oy),Math.hypot(w-ox,oy),Math.hypot(ox,h-oy),Math.hypot(w-ox,h-oy));return far/(1-ink.dip)*1.02}
- function easeSpill(p){var o=1-Math.pow(1-p,3),s=p*p*(3-2*p);return o*.55+s*.45}
- function inkPath(ink,ox,oy,Rend,p){
-  var steps=1440,R=Rend*easeSpill(p),d='',i,a,r;
-  if(R<=.5)return'';
-  for(i=0;i<steps;i++){a=i/steps*TAU;r=rimAt(ink,a,R,p);d+=(i?'L':'M')+(ox+r*Math.cos(a)).toFixed(1)+' '+(oy+r*Math.sin(a)).toFixed(1)}
-  d+='Z';
-  for(i=0;i<ink.drops.length;i++){
-   var k=ink.drops[i],dist=k[1]*Rend,born=(R-dist*.8)/(dist*.12);if(born<=0)continue;
-   var ry=Math.max(.6,k[2]*Rend*Math.min(1,born)),rx=ry*k[3],c=Math.cos(k[0]),s=Math.sin(k[0]),x=ox+dist*c,y=oy+dist*s,rot=(k[0]*180/Math.PI).toFixed(1),
-   head=(x+rx*c).toFixed(1)+' '+(y+rx*s).toFixed(1),tail=(x-rx*c).toFixed(1)+' '+(y-rx*s).toFixed(1),radii=rx.toFixed(1)+' '+ry.toFixed(1)+' '+rot;
-   d+='M'+head+'A'+radii+' 1 1 '+tail+'A'+radii+' 1 1 '+head+'Z';
-  }
-  return d;
- }
- var root=document.documentElement,busy=false;
- $('theme').onclick=function(){
-  var dark=root.dataset.theme==='dark'||(!root.dataset.theme&&matchMedia('(prefers-color-scheme:dark)').matches),next=dark?'light':'dark';
-  if(busy)return;
-  if(!document.startViewTransition||matchMedia('(prefers-reduced-motion:reduce)').matches){root.dataset.theme=next;return}
-  busy=true;
-  var b=this.getBoundingClientRect(),ox=b.left+b.width/2,oy=b.top+b.height/2,w=innerWidth,h=innerHeight,ink=makeInk(Math.random()*2147483647|0),R=coverRadius(ink,ox,oy,w,h),dur=1400;
-  var vt=document.startViewTransition(function(){root.dataset.theme=next});
-  vt.ready.then(function(){
-   var t0=performance.now();
-   (function f(now){var p=Math.min(1,(now-t0)/dur),d=inkPath(ink,ox,oy,R,p);root.style.setProperty('--ink',d?'path("'+d+'")':'circle(0px)');if(p<1)requestAnimationFrame(f)})(t0);
-  });
-  vt.finished.finally(function(){root.style.removeProperty('--ink');busy=false});
- };
-})();
+(async function init(){setupNavigation();setupForms();if(!token()){location.href='login.html';return;}await loadAll();})();
 </script>
 </body>
 </html>
